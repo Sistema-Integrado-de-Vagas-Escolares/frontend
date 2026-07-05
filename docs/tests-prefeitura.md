@@ -1,15 +1,17 @@
 # Testes — Painel Administrativo da Prefeitura
 
-⏱ Tempo estimado: 5 minutos
+⏱ **Tempo estimado:** 5 minutos
 
 ![Tela inicial do Painel Administrativo](https://res.cloudinary.com/hoekveld-dev/image/upload/v1783223378/sive/prefeitura.png)
 
 ## Credenciais
 
 **E-mail:**
-admin@caraguatatuba.sp.gov.br
+
+[admin@caraguatatuba.sp.gov.br](mailto:admin@caraguatatuba.sp.gov.br)
 
 **Senha:**
+
 Admin@2026
 
 ---
@@ -18,37 +20,39 @@ Admin@2026
 
 ### Passos
 
-1. Acessar [http://localhost:5173/prefeitura](http://localhost:5173/prefeitura)
-2. Informar o e-mail
-3. Informar a senha
-4. Clicar em **"Acessar Painel"**
+1. Acesse http://localhost:5173/prefeitura.
+2. Informe o e-mail.
+3. Informe a senha.
+4. Clique em **"Acessar Painel"**.
 
 ### Resultado esperado
 
-- Login realizado com sucesso
-- Dashboard carregado
-- Menu lateral exibido
-- Indicadores carregados
+* Login realizado com sucesso.
+* Dashboard carregado.
+* Menu lateral exibido.
+* Indicadores carregados corretamente.
 
 ---
 
 ## Fluxo 2 — Dashboard (Visão Geral)
 
-Verificar:
+### Verificações
 
-- quantidade de escolas cadastradas
-- quantidade de vagas disponíveis
-- quantidade de alunos na lista de espera
-- tempo médio de espera
-- gráfico de distribuição por modalidade
-- gráfico de distribuição por período
-- ranking das escolas com maior demanda
+Verifique:
+
+* quantidade de escolas cadastradas;
+* quantidade de vagas disponíveis;
+* quantidade de alunos na lista de espera;
+* tempo médio de espera;
+* gráfico de distribuição por modalidade;
+* gráfico de distribuição por período;
+* ranking das escolas com maior demanda.
 
 ### Resultado esperado
 
-- Todos os indicadores carregados
-- Gráficos exibidos corretamente
-- Ranking ordenado por demanda
+* Todos os indicadores são carregados corretamente.
+* Os gráficos são exibidos corretamente.
+* O ranking das escolas é ordenado por demanda.
 
 ---
 
@@ -56,25 +60,27 @@ Verificar:
 
 ### Passos
 
-1. Acessar **Métricas das Escolas**
+1. Acesse **Métricas das Escolas**.
 
-Verificar para cada escola:
+### Verificações
 
-- nome
-- bairro
-- modalidade
-- endereço
-- quantidade de vagas
-- alunos em espera
-- capacidade
-- quantidade de salas
-- períodos de funcionamento
+Para cada escola, verifique:
+
+* nome;
+* bairro;
+* modalidade;
+* endereço;
+* quantidade de vagas;
+* quantidade de alunos em lista de espera;
+* capacidade;
+* quantidade de salas;
+* períodos de funcionamento.
 
 ### Resultado esperado
 
-- Todas as escolas carregadas
-- Informações consistentes
-- Quantidade de vagas exibida corretamente
+* Todas as escolas são carregadas corretamente.
+* As informações exibidas são consistentes.
+* A quantidade de vagas é exibida corretamente.
 
 ---
 
@@ -82,43 +88,47 @@ Verificar para cada escola:
 
 ### Passos
 
-1. Acessar **Gerenciar Escolas**
+1. Acesse **Gerenciar Escolas**.
 
-Verificar:
+### Verificações
 
-- listagem das escolas
-- botão **Editar dados**
-- botão de exclusão
-- botão **Nova Escola**
-- botão **Importar CSV**
+Verifique:
+
+* listagem das escolas;
+* botão **Editar dados**;
+* botão **Excluir**;
+* botão **Nova Escola**;
+* botão **Importar CSV**.
 
 ### Resultado esperado
 
-- Todas as escolas listadas
-- Ações disponíveis para cada escola
-- Botões funcionando corretamente
+* Todas as escolas são listadas corretamente.
+* As ações estão disponíveis para cada escola.
+* Todos os botões funcionam corretamente.
 
 ---
 
 ## Fluxo 5 — Navegação
 
-Verificar:
+### Verificações
 
-- Visão Geral
-- Métricas das Escolas
-- Gerenciar Escolas
-- Lista de Espera
-- Por Bairro
-- Histórico
-- Critérios de Fila
-- Configurações
-- Configurar Domínio
+Verifique o acesso às seguintes páginas:
+
+* Visão Geral;
+* Métricas das Escolas;
+* Gerenciar Escolas;
+* Lista de Espera;
+* Por Bairro;
+* Histórico;
+* Critérios de Fila;
+* Configurações;
+* Configurar Domínio.
 
 ### Resultado esperado
 
-- Todas as páginas acessíveis
-- Menu lateral funcionando
-- Item ativo destacado corretamente
+* Todas as páginas estão acessíveis.
+* O menu lateral funciona corretamente.
+* O item correspondente à página atual permanece destacado.
 
 ---
 
@@ -126,9 +136,9 @@ Verificar:
 
 ### Passos
 
-1. Clicar em **Sair**
+1. Clique em **Sair**.
 
 ### Resultado esperado
 
-- Sessão encerrada
-- Redirecionamento para a tela de login
+* Sessão encerrada.
+* Redirecionamento para a tela de login.

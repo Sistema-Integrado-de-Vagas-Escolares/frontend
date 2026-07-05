@@ -1,6 +1,6 @@
 # Testes — Mapa de Vagas Escolares
 
-⏱ Tempo estimado: 5 minutos
+⏱ **Tempo estimado:** 5 minutos
 
 ![Tela inicial do Mapa de Vagas Escolares](https://res.cloudinary.com/hoekveld-dev/image/upload/v1783225964/sive/mapa.png)
 
@@ -9,7 +9,8 @@
 Este mapa é de acesso público, sem necessidade de login.
 
 **URL:**
-[http://localhost:5173/mapa](http://localhost:5173/mapa)
+
+http://localhost:5173/mapa
 
 ---
 
@@ -17,69 +18,69 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Acessar a URL do Mapa de Vagas Escolares
+1. Acesse a URL do Mapa de Vagas Escolares.
 
 ### Resultado esperado
 
-- Mapa carregado com os marcadores de todas as escolas
-- Data de atualização da disponibilidade exibida (ex: "Disponibilidade em tempo real · 05/07/2026")
-- Indicadores gerais carregados: total de **vagas disponíveis** e total **em lista de espera**
-- Aba **Lista de Escolas** selecionada por padrão, listando todas as escolas
-- Legenda do mapa exibida (Com vagas / Poucas vagas / Sem vagas)
-- Link **"← Central de Vagas"** disponível no topo
+* Mapa carregado com os marcadores de todas as escolas.
+* Data de atualização da disponibilidade exibida (ex.: **"Disponibilidade em tempo real · 05/07/2026"**).
+* Indicadores gerais carregados corretamente: total de **vagas disponíveis** e total de alunos **em lista de espera**.
+* Aba **Lista de Escolas** selecionada por padrão, exibindo todas as escolas.
+* Legenda do mapa exibida (**Com vagas**, **Poucas vagas** e **Sem vagas**).
+* Link **"← Central de Vagas"** disponível no topo da página.
 
 ---
 
-## Fluxo 2 — Filtro por Modalidade
+## Fluxo 2 — Filtro por modalidade
 
 ### Passos
 
-1. Clicar no filtro **Creche**
-2. Verificar o mapa e a lista de escolas
-3. Clicar no filtro **Fundamental**
-4. Verificar o mapa e a lista de escolas
-5. Clicar em **Todas** para limpar o filtro
+1. Clique no filtro **Creche**.
+2. Verifique o mapa e a lista de escolas.
+3. Clique no filtro **Ensino Fundamental**.
+4. Verifique o mapa e a lista de escolas.
+5. Clique em **Todas** para limpar o filtro.
 
 ### Resultado esperado
 
-- Ao selecionar **Creche**, somente escolas de modalidade creche são exibidas no mapa e na lista
-- Ao selecionar **Fundamental**, somente escolas de modalidade fundamental são exibidas
-- Indicadores de **vagas disponíveis** e **em lista de espera** recalculados conforme o filtro
-- Botão do filtro ativo destacado visualmente
-- Ao voltar para **Todas**, todas as escolas retornam a ser exibidas
+* Ao selecionar **Creche**, somente escolas dessa modalidade são exibidas no mapa e na lista.
+* Ao selecionar **Ensino Fundamental**, somente escolas dessa modalidade são exibidas.
+* Os indicadores de **vagas disponíveis** e **em lista de espera** são recalculados conforme o filtro aplicado.
+* O filtro ativo permanece destacado visualmente.
+* Ao selecionar **Todas**, todas as escolas voltam a ser exibidas.
 
 ---
 
-## Fluxo 3 — Filtro por Período
+## Fluxo 3 — Filtro por período
 
 ### Passos
 
-1. Clicar em **Integral**
-2. Verificar o mapa e a lista de escolas
-3. Repetir para **Manhã** e **Tarde**
-4. Clicar em **Todos** para limpar o filtro
+1. Clique em **Integral**.
+2. Verifique o mapa e a lista de escolas.
+3. Repita o procedimento para **Manhã** e **Tarde**.
+4. Clique em **Todos** para limpar o filtro.
 
 ### Resultado esperado
 
-- Somente escolas que oferecem o período selecionado são exibidas
-- Indicadores recalculados conforme o filtro aplicado
-- Filtros de modalidade e período podem ser combinados (ex: Creche + Integral)
+* Somente as escolas que oferecem o período selecionado são exibidas.
+* Os indicadores são recalculados conforme o filtro aplicado.
+* Os filtros de modalidade e período podem ser combinados (ex.: **Creche + Integral**).
 
 ---
 
-## Fluxo 4 — Filtro por Bairro
+## Fluxo 4 — Filtro por bairro
 
 ### Passos
 
-1. Clicar no seletor **"Todos os bairros"**
-2. Selecionar um bairro específico (ex: Centro, Martim de Sá)
+1. Clique no seletor **"Todos os bairros"**.
+2. Selecione um bairro específico (ex.: **Centro** ou **Martim de Sá**).
 
 ### Resultado esperado
 
-- Mapa exibe somente as escolas do bairro selecionado
-- Lista de escolas atualizada de acordo com o bairro
-- Indicadores recalculados conforme o filtro
-- Combinação com filtros de modalidade e período funcionando corretamente
+* O mapa exibe somente as escolas do bairro selecionado.
+* A lista de escolas é atualizada conforme o bairro selecionado.
+* Os indicadores são recalculados conforme o filtro aplicado.
+* A combinação com os filtros de modalidade e período funciona corretamente.
 
 ---
 
@@ -87,14 +88,14 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Digitar o nome de uma escola (ex: "Jardim das Flores") no campo **"Buscar escola ou endereço..."**
-2. Digitar um endereço (ex: "Rua das Rosas")
+1. Digite o nome de uma escola (ex.: **"Jardim das Flores"**) no campo **"Buscar escola ou endereço..."**.
+2. Digite um endereço (ex.: **"Rua das Rosas"**).
 
 ### Resultado esperado
 
-- Mapa e lista filtrados para exibir apenas os resultados correspondentes à busca
-- Busca funciona tanto por nome da escola quanto por endereço
-- Combinação da busca com os demais filtros funcionando corretamente
+* O mapa e a lista exibem apenas os resultados correspondentes à busca.
+* A busca funciona tanto pelo nome da escola quanto pelo endereço.
+* A busca pode ser combinada com os demais filtros.
 
 ---
 
@@ -102,20 +103,20 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Clicar em **Localizar** no canto superior direito do mapa
-2. Permitir o acesso à localização quando solicitado pelo navegador
+1. Clique em **Localizar**, no canto superior direito do mapa.
+2. Permita o acesso à localização quando solicitado pelo navegador.
 
 ### Resultado esperado
 
-- Navegador solicita permissão de geolocalização (se ainda não concedida)
-- Mapa centraliza na localização atual do usuário
-- Marcador da localização atual exibido no mapa
-- Escolas próximas à localização atual destacadas ou priorizadas na lista
+* O navegador solicita permissão para acessar a localização (caso ainda não tenha sido concedida).
+* O mapa é centralizado na localização atual do usuário.
+* Um marcador indicando a localização atual é exibido no mapa.
+* As escolas mais próximas da localização do usuário são destacadas ou priorizadas na lista.
 
-### Resultado esperado — permissão negada
+### Resultado esperado — Permissão negada
 
-- Mensagem informando que não foi possível obter a localização
-- Mapa permanece na visualização padrão
+* É exibida uma mensagem informando que não foi possível obter a localização.
+* O mapa permanece na visualização padrão.
 
 ---
 
@@ -123,25 +124,26 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Clicar em um marcador com status **Com vagas** (verde), ex: Paulo Freire
-2. Clicar em um marcador com status **Poucas vagas** (laranja), ex: EMEI Arco-Íris
-3. Clicar em um marcador com status **Sem vagas** (vermelho), ex: Sol Nascente
+1. Clique em um marcador com o status **Com vagas** (verde), como **Paulo Freire**.
+2. Clique em um marcador com o status **Poucas vagas** (laranja), como **EMEI Arco-Íris**.
+3. Clique em um marcador com o status **Sem vagas** (vermelho), como **Sol Nascente**.
 
 ### Resultado esperado
 
-- Ao clicar no marcador, um card de detalhes é exibido diretamente no mapa com:
-  - modalidade (Creche/Fundamental)
-  - nome da escola
-  - endereço e bairro
-  - quantidade de vagas disponíveis
-  - quantidade de alunos na espera
-  - capacidade total
-  - quantidade de salas
-  - período(s) oferecido(s) (Manhã/Tarde)
-  - botão **Consultar lista de espera**
-- Card correspondente também é destacado/aberto na lista de escolas à esquerda
-- Botão **"X"** no card fecha os detalhes
-- Cores dos marcadores correspondem corretamente à legenda (verde/laranja/vermelho)
+* Ao clicar em um marcador, um card de detalhes é exibido diretamente no mapa contendo:
+
+  * modalidade (Creche ou Ensino Fundamental);
+  * nome da escola;
+  * endereço e bairro;
+  * quantidade de vagas disponíveis;
+  * quantidade de alunos em lista de espera;
+  * capacidade total;
+  * quantidade de salas;
+  * período(s) oferecido(s) (**Manhã** e/ou **Tarde**);
+  * botão **Consultar lista de espera**.
+* O card correspondente também é destacado ou expandido na lista de escolas à esquerda.
+* O botão **"X"** fecha o card de detalhes.
+* As cores dos marcadores correspondem corretamente à legenda (verde, laranja e vermelho).
 
 ---
 
@@ -149,15 +151,15 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Acessar a aba **Lista de Escolas**
-2. Clicar em uma escola da lista
+1. Acesse a aba **Lista de Escolas**.
+2. Clique em uma escola da lista.
 
 ### Resultado esperado
 
-- Escolas listadas com modalidade, bairro, nome, endereço e quantidade de vagas
-- Card expandido exibe: alunos na espera, capacidade, quantidade de salas e períodos oferecidos
-- Botão **Consultar lista de espera** disponível em cada escola
-- Ao clicar em uma escola da lista, o mapa centraliza no marcador correspondente
+* As escolas são listadas com modalidade, bairro, nome, endereço e quantidade de vagas.
+* O card expandido exibe a quantidade de alunos em lista de espera, capacidade, quantidade de salas e períodos oferecidos.
+* O botão **Consultar lista de espera** está disponível em cada escola.
+* Ao clicar em uma escola da lista, o mapa é centralizado no marcador correspondente.
 
 ---
 
@@ -165,11 +167,11 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Clicar na aba **Sobre o sistema**
+1. Clique na aba **Sobre o sistema**.
 
 ### Resultado esperado
 
-- Conteúdo informativo sobre o funcionamento do mapa e da lista de espera exibido corretamente
+* O conteúdo informativo sobre o funcionamento do mapa e da lista de espera é exibido corretamente.
 
 ---
 
@@ -177,11 +179,11 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Em qualquer escola (card do mapa ou da lista), clicar em **Consultar lista de espera**
+1. Em qualquer escola (pelo card do mapa ou da lista), clique em **Consultar lista de espera**.
 
 ### Resultado esperado
 
-- Redirecionamento (ou abertura) para a página/portal correspondente de consulta da lista de espera daquela escola
+* O usuário é redirecionado para a página ou portal correspondente para consultar a lista de espera da escola selecionada.
 
 ---
 
@@ -189,8 +191,8 @@ Este mapa é de acesso público, sem necessidade de login.
 
 ### Passos
 
-1. Clicar em **"← Central de Vagas"**
+1. Clique em **"← Central de Vagas"**.
 
 ### Resultado esperado
 
-- Redirecionamento para a página pública da Central de Vagas
+* Redirecionamento para a página pública da **Central de Vagas**.

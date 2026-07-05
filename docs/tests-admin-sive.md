@@ -1,15 +1,17 @@
 # Testes — Painel Administrativo SIVE
 
-⏱ Tempo estimado: 5 minutos
+⏱ **Tempo estimado:** 5 minutos
 
 ![Tela inicial do painel administrativo SIVE](https://res.cloudinary.com/hoekveld-dev/image/upload/v1783222262/sive/sive-admin.png)
 
 ## Credenciais
 
-Email:
-admin@sive.com.br
+**E-mail:**
 
-Senha:
+[admin@sive.com.br](mailto:admin@sive.com.br)
+
+**Senha:**
+
 Sive@Admin2026
 
 ---
@@ -18,73 +20,81 @@ Sive@Admin2026
 
 ### Passos
 
-1. Acessar [http://localhost:5173/sive-admin](http://localhost:5173/sive-admin)
-2. Informar as credenciais
-3. Clicar em "Acessar painel administrativo"
+1. Acesse http://localhost:5173/sive-admin.
+2. Informe as credenciais.
+3. Clique em **"Acessar painel administrativo"**.
 
 ### Resultado esperado
 
-- Login realizado
-- Dashboard exibido
-- Estatísticas carregadas
+* Login realizado com sucesso.
+* Dashboard exibido.
+* Estatísticas carregadas.
 
 ---
 
 ## Fluxo 2 — Dashboard
 
-Verificar:
+Verifique:
 
-- quantidade de prefeituras
-- quantidade de escolas
-- prefeituras ativas
-- aguardando ativação
+* quantidade de prefeituras;
+* quantidade de escolas;
+* prefeituras ativas;
+* prefeituras aguardando ativação.
 
 ---
 
 ## Fluxo 3 — Cadastro de prefeitura
 
-1. Clicar em "Nova prefeitura"
-2. Preencher os campos obrigatórios
-3. Salvar
+### Passos
 
-Resultado esperado:
+1. Clique em **"Nova prefeitura"**.
+2. Preencha os campos obrigatórios.
+3. Clique em **Salvar**.
 
-- prefeitura criada
-- credenciais geradas
-- módulos habilitados
+### Resultado esperado
+
+* Prefeitura criada com sucesso.
+* Credenciais geradas.
+* Módulos habilitados.
 
 ---
 
 ## Fluxo 4 — Editar prefeitura
 
-1. Clicar em "Editar" na prefeitura desejada
-2. Alterar os campos desejados
-3. Salvar
+### Passos
 
-Resultado esperado:
+1. Clique em **"Editar"** na prefeitura desejada.
+2. Altere os campos desejados.
+3. Clique em **Salvar**.
 
-- prefeitura atualizada
-- alterações refletidas na listagem
+### Resultado esperado
+
+* Prefeitura atualizada com sucesso.
+* Alterações refletidas na listagem.
 
 ---
 
 ## Fluxo 5 — Redefinir senha
 
-1. Clicar em "Redefinir senha" na prefeitura desejada
-2. Confirmar a ação
-3. Salvar
+### Passos
 
-Resultado esperado:
+1. Clique em **"Redefinir senha"** na prefeitura desejada.
+2. Confirme a ação.
+3. Clique em **Salvar**.
 
-- senha redefinida
+### Resultado esperado
+
+* Senha redefinida com sucesso.
+
+---
 
 ## Fluxo 6 — Logout
 
 ### Passos
 
-1. Clicar em **Sair**
+1. Clique em **Sair**.
 
 ### Resultado esperado
 
-- Sessão encerrada
-- Redirecionamento para a tela de login
+* Sessão encerrada.
+* Redirecionamento para a tela de login.

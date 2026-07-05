@@ -12,6 +12,7 @@ import {
   School,
   TrendingUp,
   Star,
+  AlertCircle,
 } from "lucide-react";
 import {
   Card,
@@ -146,7 +147,24 @@ type DashTab = "escolas" | "tendencias";
 // ==================== LOGIN ====================
 
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
+
   const navigate = useNavigate();
+
+
+  const handleLogin = () => {
+    if (email === "admin@caraguatatuba.sp.gov.br" && password === "Admin@2026") {
+      setLoginError(false);
+      onLogin();
+      setPassword("");
+      setEmail("");
+    } else {
+      setLoginError(true);
+    }
+  };
+
   return (
     <div className="min-h-screen font-[Inter,sans-serif] lg:flex">
       {/* Desktop: left blue panel */}
@@ -212,14 +230,24 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <FormField
                 label="E-mail institucional"
                 placeholder="nome@municipio.sp.gov.br"
+                value={email}
+                onChange={(value) => { setEmail(value); setLoginError(false); }}
                 type="email"
               />
               <FormField
                 label="Senha"
                 placeholder="••••••••"
                 type="password"
+                value={password}
+                onChange={(value) => { setPassword(value); setLoginError(false) }}
               />
-              <PrimaryBtn onClick={onLogin}>Acessar o SIVE</PrimaryBtn>
+              {loginError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                  <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                  <p className="text-red-600 text-xs">Credenciais inválidas. Verifique e-mail e senha.</p>
+                </div>
+              )}
+              <PrimaryBtn onClick={handleLogin}>Acessar o SIVE</PrimaryBtn>
             </div>
 
             {/* Support note — no self-service recovery */}

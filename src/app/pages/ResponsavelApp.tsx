@@ -61,10 +61,24 @@ const DOCS = [
 ];
 
 export default function ResponsavelApp() {
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
   const [screen, setScreen] = useState<Screen>("login");
   const [cpf, setCpf] = useState("");
   const [selChild, setSelChild] = useState<typeof mockChildren[0] | null>(null);
   const navigate = useNavigate();
+
+  const handleLogin = () => {
+    if (cpf === "123.456.789-00" && password === "Resp@2026") {
+      setLoginError(false);
+      setScreen("home");
+      setPassword("");
+      setCpf("");
+    } else {
+      setLoginError(true);
+    }
+  };
+
 
   // ---- LOGIN ----
   if (screen === "login") {
@@ -133,8 +147,14 @@ export default function ResponsavelApp() {
 
               <div className="bg-white rounded-3xl p-6 space-y-4 shadow-sm border border-[#e8edf8]">
                 <FormField label="CPF do Responsável" placeholder="000.000.000-00" type="tel" value={cpf} onChange={(v) => setCpf(formatCPF(v))} />
-                <FormField label="Senha" placeholder="••••••••" type="password" />
-                <PrimaryBtn onClick={() => setScreen("home")}>Entrar</PrimaryBtn>
+                <FormField label="Senha" placeholder="••••••••" type="password" value={password} onChange={(password) => setPassword(password)} />
+                {loginError && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                    <p className="text-red-600 text-xs">Credenciais inválidas. Verifique e-mail e senha.</p>
+                  </div>
+                )}
+                <PrimaryBtn onClick={handleLogin}>Entrar</PrimaryBtn>
                 <p className="text-center text-[#979799] text-sm">
                   Esqueceu a senha?{" "}
                   <span className="text-[#3b5fe0] font-semibold cursor-pointer hover:underline">Recuperar acesso</span>
@@ -181,9 +201,6 @@ export default function ResponsavelApp() {
         <div className="max-w-4xl mx-auto">
           <div className="hidden lg:flex items-center justify-between px-8 pt-8 pb-4">
             <div>
-              <button onClick={() => navigate("/portal")} className="flex items-center gap-1.5 text-[#979799] text-xs mb-3 hover:text-[#5e6062]">
-                <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao portal
-              </button>
               <h2 className="text-[#263238] text-2xl font-bold">Olá, Maria Oliveira</h2>
               <p className="text-[#979799] text-sm mt-0.5">CPF: 123.456.789-00 · Atualizado em 03/07/2026</p>
             </div>
@@ -269,9 +286,6 @@ export default function ResponsavelApp() {
 
         <div className="max-w-4xl mx-auto">
           <div className="hidden lg:block px-8 pt-8 pb-2">
-            <button onClick={() => navigate("/portal")} className="text-[#979799] text-xs mb-3 hover:text-[#5e6062] flex items-center gap-1.5">
-              <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao portal
-            </button>
             <div className="flex items-center gap-2 mb-4">
               <button onClick={() => setScreen("home")} className="text-[#979799] text-sm hover:text-[#5e6062] flex items-center gap-1.5">
                 <ArrowLeft className="w-4 h-4" /> Meus filhos

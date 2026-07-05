@@ -1591,11 +1591,26 @@ function DominioTab() {
 }
 
 export default function PrefeituraApp() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [screen, setScreen] = useState<Screen>("login");
   const [tab, setTab] = useState<Tab>("overview");
   const [criterios, setCriterios] = useState<Criterio[]>(defaultCriterios);
+  const [loginError, setLoginError] = useState(false);
   const navigate = useNavigate();
   const { schools } = useSchools();
+
+
+  const handleLogin = () => {
+    if (email === "admin@caraguatatuba.sp.gov.br" && password === "Admin@2026") {
+      setLoginError(false);
+      setScreen("dashboard");
+      setPassword("");
+      setEmail("");
+    } else {
+      setLoginError(true);
+    }
+  };
 
   if (screen === "login") {
     return (
@@ -1605,17 +1620,22 @@ export default function PrefeituraApp() {
             <div className="flex items-center gap-4 mb-5">
               <img src={brasao} alt="Brasão Caraguatatuba" className="h-14 w-auto object-contain" />
               <div>
-                <p className="text-white/55 text-xs font-bold uppercase tracking-wider">Painel da Prefeitura</p>
+                <p className="text-white/55 text-xs font-bold uppercase tracking-wider">Prefeitura Municipal</p>
                 <p className="text-white font-bold leading-tight">Caraguatatuba — SP</p>
-                <p className="text-white/55 text-xs">Secretaria Municipal de Educação</p>
               </div>
             </div>
-            <h2 className="text-white text-xl font-bold">Acesso Administrativo</h2>
+            <h2 className="text-white text-xl font-bold">Painel da Prefeitura</h2>
           </div>
           <div className="bg-white px-6 py-6 space-y-4 lg:rounded-b-3xl shadow-xl">
-            <FormField label="E-mail institucional" placeholder="nome@caraguatatuba.sp.gov.br" type="email" />
-            <FormField label="Senha" placeholder="••••••••" type="password" />
-            <PrimaryBtn onClick={() => setScreen("dashboard")}>Acessar Painel</PrimaryBtn>
+            <FormField label="E-mail institucional" placeholder="nome@caraguatatuba.sp.gov.br" type="email" value={email} onChange={(value) => { setEmail(value); setLoginError(false); }} />
+            <FormField label="Senha" placeholder="••••••••" type="password" value={password} onChange={(value) => { setPassword(value); setLoginError(false); }} />
+            {loginError && (
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                <p className="text-red-600 text-xs">Credenciais inválidas. Verifique e-mail e senha.</p>
+              </div>
+            )}
+            <PrimaryBtn onClick={handleLogin}>Acessar Painel</PrimaryBtn>
           </div>
         </div>
       </div>

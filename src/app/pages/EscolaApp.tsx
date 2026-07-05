@@ -137,6 +137,9 @@ function EscolaSidebar({
 // ==================== MAIN ====================
 
 export default function EscolaApp() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
   const [screen, setScreen] = useState<Screen>("login");
   const [responsaveis, setResponsaveis] = useState<Responsavel[]>(initResponsaveis);
   const [children, setChildren] = useState<Child[]>(initChildren);
@@ -211,6 +214,17 @@ export default function EscolaApp() {
   const go = (s: Screen) => setScreen(s);
   const loggedIn = screen !== "login";
 
+  const handleLogin = () => {
+    if (email === "EMEI-0012" && password === "Escola@2026") {
+      setLoginError(false);
+      setScreen("dashboard");
+      setPassword("");
+      setEmail("");
+    } else {
+      setLoginError(true);
+    }
+  };
+
   // Wrap logged-in screens in PortalLayout (desktop sidebar)
   const withLayout = (content: React.ReactNode) => (
     <PortalLayout
@@ -230,18 +244,25 @@ export default function EscolaApp() {
       <div className="min-h-screen bg-[#f0f4ff] flex flex-col font-[Inter,sans-serif] lg:items-center lg:justify-center">
         <div className="w-full max-w-sm mx-auto">
           <div className="bg-[#3b5fe0] px-6 pt-8 pb-8 lg:rounded-t-3xl">
-            <div className="flex items-center gap-3 mb-2">
-              <img src={brasao} alt="Brasão" className="h-12 w-auto object-contain" />
+            <div className="flex items-center gap-4 mb-5">
+              <img src={brasao} alt="Brasão" className="h-14 w-auto object-contain" />
               <div>
-                <p className="text-white/50 text-xs font-bold uppercase tracking-wider">Painel da Escola</p>
+                <p className="text-white/50 text-xs font-bold uppercase tracking-wider">Prefeitura Municipal</p>
                 <p className="text-white font-bold leading-tight">Caraguatatuba — SP</p>
               </div>
             </div>
+            <h2 className="text-white text-xl font-bold">Painel da Escola</h2>
           </div>
           <div className="bg-white px-6 py-6 space-y-4 lg:rounded-b-3xl shadow-xl">
-            <FormField label="Código da Escola" placeholder="ex: EMEI-0012" />
-            <FormField label="Senha" placeholder="••••••••" type="password" />
-            <PrimaryBtn onClick={() => go("dashboard")}>Acessar Painel</PrimaryBtn>
+            <FormField label="Código da Escola" placeholder="ex: EMEI-0012" type="email" value={email} onChange={(value) => { setEmail(value); setLoginError(false); }} />
+            <FormField label="Senha" placeholder="••••••••" type="password" value={password} onChange={(value) => { setPassword(value); setLoginError(false); }} />
+            {loginError && (
+              <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+                <p className="text-red-600 text-xs">Credenciais inválidas. Verifique e-mail e senha.</p>
+              </div>
+            )}
+            <PrimaryBtn onClick={handleLogin}>Acessar Painel</PrimaryBtn>
           </div>
         </div>
       </div>

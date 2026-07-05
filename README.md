@@ -12,8 +12,8 @@ Interface web do Sistema Integrado de Vagas Escolares (SIVE), criada com Vite, R
 Clone o repositorio e acesse a pasta `frontend`:
 
 ```bash
-git clone https://github.com/Sistema-Integrado-de-Vagas-Escolares/api.git
-cd api/frontend
+git clone https://github.com/Sistema-Integrado-de-Vagas-Escolares/frontend.git
+cd frontend
 ```
 
 Instale as dependencias do projeto:

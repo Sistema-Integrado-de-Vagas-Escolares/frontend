@@ -20,7 +20,7 @@ Admin@2026
 
 ### Passos
 
-1. Acesse http://localhost:5173/portal.
+1. Abra o endereço em uma nova aba do navegador: http://localhost:5173/portal.
 2. Informe o e-mail institucional.
 3. Informe a senha.
 4. Clique em **"Acessar o SIVE"**.

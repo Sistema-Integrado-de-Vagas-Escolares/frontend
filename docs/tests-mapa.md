@@ -10,7 +10,7 @@ Este mapa é de acesso público, sem necessidade de login.
 
 **URL:**
 
-http://localhost:5173/mapa
+Abra o endereço em uma nova aba do navegador: http://localhost:5173/mapa
 
 ---
 

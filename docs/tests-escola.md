@@ -20,7 +20,7 @@ Escola@2026
 
 ### Passos
 
-1. Acesse http://localhost:5173/escola.
+1. Abra o endereço em uma nova aba do navegador: http://localhost:5173/escola.
 2. Informe o código da escola.
 3. Informe a senha.
 4. Clique em **"Acessar Painel"**.

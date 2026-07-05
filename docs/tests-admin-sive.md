@@ -20,7 +20,7 @@ Sive@Admin2026
 
 ### Passos
 
-1. Acesse http://localhost:5173/sive-admin.
+1. Abra o endereço em uma nova aba do navegador http://localhost:5173/sive-admin.
 2. Informe as credenciais.
 3. Clique em **"Acessar painel administrativo"**.
 

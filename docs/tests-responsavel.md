@@ -20,7 +20,7 @@ Resp@2026
 
 ### Passos
 
-1. Acesse http://localhost:5173/responsavel.
+1. Abra o endereço em uma nova aba do navegador: http://localhost:5173/responsavel.
 2. Informe o CPF do responsável.
 3. Informe a senha.
 4. Clique em **"Entrar"**.

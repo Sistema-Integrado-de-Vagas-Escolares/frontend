@@ -50,7 +50,7 @@ Acesse os documentos de teste de cada perfil na ordem sugerida de navegação:
 | 2     | Portal SIVE (login e seleção de módulos) | [docs/tests-portal-sive.md](docs/tests-portal-sive.md)     |
 | 3     | Prefeitura                               | [docs/tests-prefeitura.md](docs/tests-prefeitura.md)       |
 | 4     | Escola                                   | [docs/tests-escola.md](docs/tests-escola.md)               |
-| 5     | Central de Vagas                         | [docs/tests-central-vagas.md](docs/tests-central-vagas.md) |
+| 5     | Central de Vagas                         | [docs/tests-central-de-vagas.md](docs/tests-central-de-vagas.md) |
 | 6     | Mapa Inteligente                         | [docs/tests-mapa.md](docs/tests-mapa.md)                   |
 | 7     | Responsáveis                             | [docs/tests-responsavel.md](docs/tests-responsavel.md)     |
 

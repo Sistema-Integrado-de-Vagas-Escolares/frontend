@@ -42,7 +42,7 @@ Cada perfil do sistema possui um documento próprio contendo:
 
 Acesse os documentos de teste para cada perfil, na ordem sugerida de navegação:
 
-⏱ Tempo estimado: 53 minutos
+⏱ Tempo estimado: 40 minutos
 
 | Ordem | Área | Documento |
 | ----- | ---- | --------- |

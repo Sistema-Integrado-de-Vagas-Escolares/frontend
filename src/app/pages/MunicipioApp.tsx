@@ -11,11 +11,9 @@ import {
   CheckCircle,
   School,
   TrendingUp,
-  ChevronRight,
   Star,
 } from "lucide-react";
 import {
-  BackToPortals,
   Card,
   PrimaryBtn,
   FormField,
@@ -234,9 +232,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 className="flex items-center justify-center gap-1.5 text-[#3b5fe0] text-sm font-bold mt-2 hover:underline">
                 suporte@sive.com.br
               </a>
-              <p className="text-[#bfc5d2] text-[10px] text-center mt-2">
-                Não é possível recuperar senha por e-mail — acesso restrito.
-              </p>
             </div>
 
             <p className="text-center text-[#bfc5d2] text-xs mt-4 leading-relaxed">

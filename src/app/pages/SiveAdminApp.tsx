@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
-  Building2, Plus, Edit3, Trash2, Lock, CheckCircle, AlertCircle,
-  LogOut, X, Eye, EyeOff, Users, School, Globe, Settings,
-  ChevronRight, Save, ArrowLeft, KeyRound, ShieldCheck,
+  Building2, Plus, Edit3, Trash2, CheckCircle, AlertCircle,
+  LogOut, X, Eye, EyeOff, School, Settings,
+  Save, ArrowLeft, KeyRound, ShieldCheck,
 } from "lucide-react";
-import { Card, FormField, PrimaryBtn, SecondaryBtn } from "../components/Shared";
+import { Card, FormField } from "../components/Shared";
 import siveLogo from "@/imports/SIVE_teste__6_-removebg-preview-2.png";
 
 // ==================== TYPES ====================

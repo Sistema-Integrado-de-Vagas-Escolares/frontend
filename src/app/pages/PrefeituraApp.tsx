@@ -16,7 +16,6 @@ import {
 import { prefData } from "../data";
 import { useSchools } from "../context/SchoolsContext";
 import brasao from "@/imports/brasao-removebg-preview.png";
-import siveLogo from "@/imports/SIVE_teste__6_-removebg-preview-2.png";
 
 type Screen = "login" | "dashboard";
 type Tab = "overview" | "escolas" | "gerenciar" | "espera" | "bairros" | "historico" | "criterios" | "configuracoes" | "dominio";
@@ -94,9 +93,6 @@ function Sidebar({ tab, setTab, onLogout }: { tab: Tab; setTab: (t: Tab) => void
       </nav>
 
       <div className="px-4 pb-5 pt-4 space-y-3">
-        <div className="flex justify-center">
-          <img src={siveLogo} alt="SIVE" className="h-10 w-auto object-contain opacity-80" />
-        </div>
         <button onClick={onLogout}
           className="w-full flex items-center justify-center gap-2 border border-white/40 text-white text-sm font-semibold py-2.5 rounded-xl hover:bg-white/10 transition-colors">
           <LogOut className="w-4 h-4" /> Sair
@@ -1605,7 +1601,6 @@ export default function PrefeituraApp() {
     return (
       <div className="min-h-screen bg-[#f0f4ff] font-[Inter,sans-serif] lg:items-center lg:justify-center lg:flex">
         <div className="w-full max-w-sm mx-auto">
-          <BackToPortals alwaysShow />
           <div className="bg-[#3b5fe0] px-6 pt-8 pb-8 lg:rounded-t-3xl">
             <div className="flex items-center gap-4 mb-5">
               <img src={brasao} alt="Brasão Caraguatatuba" className="h-14 w-auto object-contain" />

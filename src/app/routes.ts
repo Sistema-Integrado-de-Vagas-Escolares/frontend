@@ -1,4 +1,4 @@
-import { createMemoryRouter } from "react-router";
+import { createBrowserRouter } from "react-router";
 import Root from "./Root";
 import PortalSelector from "./pages/PortalSelector";
 import PrefeituraApp from "./pages/PrefeituraApp";
@@ -9,7 +9,7 @@ import MunicipioApp, { MunicipioDashboardPage } from "./pages/MunicipioApp";
 import CentralApp from "./pages/CentralApp";
 import SiveAdminApp from "./pages/SiveAdminApp";
 
-export const router = createMemoryRouter([
+export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,

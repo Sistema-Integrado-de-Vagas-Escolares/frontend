@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router";
 import { BarChart3, Users, Building2, MapPin, ArrowRight, LogOut, Globe } from "lucide-react";
 import siveLogo from "@/imports/SIVE_teste__6_-removebg-preview-2.png";
 import brasao from "@/imports/brasao-removebg-preview.png";
@@ -47,7 +46,6 @@ const portals = [
 ];
 
 export default function PortalSelector() {
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#f0f4ff] font-[Inter,sans-serif]">
       {/* Hero */}
@@ -65,21 +63,21 @@ export default function PortalSelector() {
             </div>
 
             {/* Logo SIVE + Sair empilhados */}
-            <div className="hidden lg:flex flex-col items-center gap-3">
+            <div className="hidden lg:flex flex-col items-center gap-1">
               <img src={siveLogo} alt="SIVE" className="h-24 w-auto object-contain opacity-90 mx-[8px] my-[0px]" />
-              <button
-                onClick={() => navigate("/")}
+              <a
+                href="/"
                 className="flex items-center gap-2 text-white text-sm font-semibold border border-white/40 rounded-xl px-4 py-2 hover:bg-white/10 transition-colors w-full justify-center"
               >
                 <LogOut className="w-4 h-4" /> Sair
-              </button>
+              </a>
             </div>
 
             {/* Mobile: só botão Sair */}
-            <button onClick={() => navigate("/")}
+            <a href="/"
               className="lg:hidden flex items-center gap-1.5 border border-white/30 text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-white/10 transition-colors">
               <LogOut className="w-3.5 h-3.5" /> Sair
-            </button>
+            </a>
           </div>
 
           <p className="text-white/65 text-sm leading-relaxed max-w-xl">
@@ -94,9 +92,11 @@ export default function PortalSelector() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {portals.map((p) => (
-            <button
+            <a
               key={p.path}
-              onClick={() => navigate(p.path)}
+              href={p.path}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 flex items-start gap-5 border border-[#e8edf8] text-left hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.97] transition-all group"
             >
               <div className="w-14 h-14 bg-[#3b5fe0]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
@@ -114,7 +114,7 @@ export default function PortalSelector() {
                   <ArrowRight className="w-4 h-4 text-[#bfc5d2] group-hover:text-white transition-colors" />
                 </div>
               </div>
-            </button>
+            </a>
           ))}
         </div>
 

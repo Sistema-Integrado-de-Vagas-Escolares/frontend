@@ -30,27 +30,6 @@ Inicie o servidor local com:
 npm run dev
 ```
 
-O Vite vai disponibilizar a aplicacao em `http://localhost:5173` por padrao.
-
-### Gerar build de producao
-
-Para validar a compilacao final do frontend:
-
-```bash
-npm run build
-```
-
-### Publicar na Cloudflare Pages
-
-O frontend esta preparado para Cloudflare Pages.
-
-1. Gere o build de producao.
-2. Publique a pasta `dist` com Wrangler:
-
-```bash
-npm run deploy:pages
-```
-
 ### 🧪 Documentação para avaliação
 
 Cada perfil do sistema possui um documento próprio contendo:

@@ -2,6 +2,7 @@ import { apiRequest } from '@/api/utils/api';
 import type {
   CriarResponsavelRequest,
   Responsavel,
+  ResponsavelDetalhe,
   ResponsavelResumo,
 } from '@/entities/responsavel';
 
@@ -33,6 +34,21 @@ export async function listarResponsaveisEscola(
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+export async function buscarResponsavelDetalheEscola(
+  token: string,
+  responsavelId: string,
+): Promise<ResponsavelDetalhe> {
+  return apiRequest<ResponsavelDetalhe>(
+    `/api/escola/responsaveis/${responsavelId}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 }
 
 export async function cadastrarResponsavelEscola(

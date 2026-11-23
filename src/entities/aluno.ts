@@ -62,8 +62,15 @@ export interface AlunoDetalhe {
   endereco: Endereco | null;
   rendaPerCapita: number;
   temNecessidadeEspecial: boolean;
+  vulnerabilidadeSocioeconomica: boolean;
+  responsavelSolo: boolean;
+  moraDeAluguel: boolean;
+  bolsaFamilia: boolean;
+  bpcLoas: boolean;
+  irmaoMatriculado: boolean;
   protocolo: string | null;
   etapaOuTurma: string | null;
+  serieAno: string | null;
   turmaNome: string | null;
   tipoVaga: TipoVaga | null;
   turno: Turno | null;

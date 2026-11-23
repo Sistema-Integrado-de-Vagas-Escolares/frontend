@@ -4,7 +4,10 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { clearEscolaSession, getEscolaSession } from '@/api/auth/login';
-import { cadastrarAlunoEscola } from '@/api/escola/alunos';
+import {
+  atualizarAlunoEscola,
+  cadastrarAlunoEscola,
+} from '@/api/escola/alunos';
 import { listarResponsaveisEscola } from '@/api/escola/responsaveis';
 import { alunosKeys } from '@/api/escola/use-alunos';
 import { inscricoesKeys } from '@/api/escola/use-inscricoes';
@@ -18,7 +21,12 @@ import {
   type SugestaoNivelPorNascimento,
 } from '@/constants/niveis';
 import { ROUTES } from '@/constants/routes';
-import type { Parentesco, TipoVaga, Turno } from '@/entities/aluno';
+import type {
+  AlunoDetalhe,
+  Parentesco,
+  TipoVaga,
+  Turno,
+} from '@/entities/aluno';
 import type { ResponsavelResumo } from '@/entities/responsavel';
 import { cn } from '@/lib/utils';
 import {
@@ -26,6 +34,7 @@ import {
   calcularPontuacaoRenda,
   formatCep,
   formatDataBrInput,
+  formatIsoDateToBr,
   PESOS_CRITERIOS,
   validateAlunoForm,
   type AlunoFormErrors,
@@ -96,46 +105,84 @@ interface ResponsavelVinculadoItem {
   parentesco: Parentesco;
 }
 
-export function AlunoForm() {
+interface AlunoFormProps {
+  initialAluno?: AlunoDetalhe;
+  redirectToAfterSave?: string;
+}
+
+function formatRendaInitial(value?: number | null): string {
+  if (value === undefined || value === null) return '';
+  return Number(value).toFixed(2).replace('.', ',');
+}
+
+export function AlunoForm({
+  initialAluno,
+  redirectToAfterSave,
+}: AlunoFormProps) {
+  const isEditing = Boolean(initialAluno);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { refreshResumo } = usePainel();
 
-  const [nome, setNome] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [dataNascimento, setDataNascimento] = useState('');
-  const [tipoVaga, setTipoVaga] = useState<TipoVaga>('CRECHE');
-  const [serieAno, setSerieAno] = useState<string>(
-    getNiveisPorTipoVaga('CRECHE')[0],
+  const initialTipoVaga: TipoVaga = initialAluno?.tipoVaga ?? 'CRECHE';
+  const initialSerieAno =
+    initialAluno?.serieAno ??
+    initialAluno?.etapaOuTurma ??
+    getNiveisPorTipoVaga(initialTipoVaga)[0];
+
+  const [nome, setNome] = useState(initialAluno?.nome ?? '');
+  const [cpf, setCpf] = useState(initialAluno?.cpf ?? '');
+  const [dataNascimento, setDataNascimento] = useState(
+    initialAluno?.dataNascimento
+      ? formatIsoDateToBr(initialAluno.dataNascimento)
+      : '',
   );
-  const [turno, setTurno] = useState<Turno>('INTEGRAL');
-  const [cep, setCep] = useState('');
+  const [tipoVaga, setTipoVaga] = useState<TipoVaga>(initialTipoVaga);
+  const [serieAno, setSerieAno] = useState<string>(initialSerieAno);
+  const [turno, setTurno] = useState<Turno>(initialAluno?.turno ?? 'INTEGRAL');
+  const [cep, setCep] = useState(initialAluno?.endereco?.cep ?? '');
   const [isFetchingCep, setIsFetchingCep] = useState(false);
   const [cepMessage, setCepMessage] = useState<string | null>(null);
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('');
-  const [rendaPerCapita, setRendaPerCapita] = useState('');
+  const [rua, setRua] = useState(initialAluno?.endereco?.rua ?? '');
+  const [numero, setNumero] = useState(initialAluno?.endereco?.numero ?? '');
+  const [complemento, setComplemento] = useState(
+    initialAluno?.endereco?.complemento ?? '',
+  );
+  const [bairro, setBairro] = useState(initialAluno?.endereco?.bairro ?? '');
+  const [cidade, setCidade] = useState(initialAluno?.endereco?.cidade ?? '');
+  const [estado, setEstado] = useState(initialAluno?.endereco?.estado ?? '');
+  const [rendaPerCapita, setRendaPerCapita] = useState(
+    initialAluno ? formatRendaInitial(initialAluno.rendaPerCapita) : '',
+  );
 
   const [criterios, setCriterios] = useState<
     Record<CriterioToggleKey, boolean>
   >({
-    vulnerabilidadeSocioeconomica: false,
-    responsavelSolo: false,
-    moraDeAluguel: false,
-    bolsaFamilia: false,
-    bpcLoas: false,
-    temNecessidadeEspecial: false,
-    irmaoMatriculado: false,
+    vulnerabilidadeSocioeconomica:
+      initialAluno?.vulnerabilidadeSocioeconomica ?? false,
+    responsavelSolo: initialAluno?.responsavelSolo ?? false,
+    moraDeAluguel: initialAluno?.moraDeAluguel ?? false,
+    bolsaFamilia: initialAluno?.bolsaFamilia ?? false,
+    bpcLoas: initialAluno?.bpcLoas ?? false,
+    temNecessidadeEspecial: initialAluno?.temNecessidadeEspecial ?? false,
+    irmaoMatriculado: initialAluno?.irmaoMatriculado ?? false,
   });
 
   const [cpfBusca, setCpfBusca] = useState('');
   const [isSearchingCpf, setIsSearchingCpf] = useState(false);
   const [cpfSearchError, setCpfSearchError] = useState<string | null>(null);
-  const [vinculados, setVinculados] = useState<ResponsavelVinculadoItem[]>([]);
+  const [vinculados, setVinculados] = useState<ResponsavelVinculadoItem[]>(() =>
+    (initialAluno?.responsaveis ?? []).map((r) => ({
+      responsavel: {
+        id: r.id,
+        nome: r.nome,
+        cpf: r.cpf,
+        telefone: r.telefone,
+        totalFilhos: 0,
+      },
+      parentesco: r.parentesco,
+    })),
+  );
 
   const [fieldErrors, setFieldErrors] = useState<AlunoFormErrors>({});
   const [nivelSugerido, setNivelSugerido] =
@@ -262,29 +309,32 @@ export function AlunoForm() {
     event.preventDefault();
     setSubmitError(null);
 
-    const validation = validateAlunoForm({
-      nome,
-      cpf,
-      dataNascimento,
-      tipoVaga,
-      serieAno,
-      turno,
-      endereco: {
-        cep,
-        rua,
-        numero,
-        complemento,
-        bairro,
-        cidade,
-        estado,
+    const validation = validateAlunoForm(
+      {
+        nome,
+        cpf,
+        dataNascimento,
+        tipoVaga,
+        serieAno,
+        turno,
+        endereco: {
+          cep,
+          rua,
+          numero,
+          complemento,
+          bairro,
+          cidade,
+          estado,
+        },
+        rendaPerCapita,
+        ...criterios,
+        responsaveis: vinculados.map((v) => ({
+          responsavelId: v.responsavel.id,
+          parentesco: v.parentesco,
+        })),
       },
-      rendaPerCapita,
-      ...criterios,
-      responsaveis: vinculados.map((v) => ({
-        responsavelId: v.responsavel.id,
-        parentesco: v.parentesco,
-      })),
-    });
+      { allowMaskedCpf: isEditing },
+    );
 
     if (!validation.valid) {
       setFieldErrors(validation.errors);
@@ -301,13 +351,30 @@ export function AlunoForm() {
     setIsSubmitting(true);
 
     try {
-      await cadastrarAlunoEscola(session.token, validation.payload);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: alunosKeys.all }),
-        queryClient.invalidateQueries({ queryKey: inscricoesKeys.all }),
-        refreshResumo(),
-      ]);
-      router.push(ROUTES.ALUNOS);
+      if (isEditing && initialAluno) {
+        const updated = await atualizarAlunoEscola(
+          session.token,
+          initialAluno.id,
+          validation.payload,
+        );
+        queryClient.setQueryData(alunosKeys.detail(initialAluno.id), updated);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: alunosKeys.all }),
+          queryClient.invalidateQueries({ queryKey: inscricoesKeys.all }),
+          refreshResumo(),
+        ]);
+        router.push(
+          redirectToAfterSave ?? ROUTES.ALUNO_DETALHE(initialAluno.id),
+        );
+      } else {
+        await cadastrarAlunoEscola(session.token, validation.payload);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: alunosKeys.all }),
+          queryClient.invalidateQueries({ queryKey: inscricoesKeys.all }),
+          refreshResumo(),
+        ]);
+        router.push(ROUTES.ALUNOS);
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
@@ -317,7 +384,11 @@ export function AlunoForm() {
         }
         setSubmitError(error.message);
       } else {
-        setSubmitError('Não foi possível cadastrar o aluno. Tente novamente.');
+        setSubmitError(
+          isEditing
+            ? 'Não foi possível atualizar o aluno. Tente novamente.'
+            : 'Não foi possível cadastrar o aluno. Tente novamente.',
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -1007,7 +1078,13 @@ export function AlunoForm() {
         disabled={isSubmitting}
         className="h-[48px] w-full rounded-[14px] bg-[#3b5fe0] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] text-white hover:bg-[#3252c7]"
       >
-        {isSubmitting ? 'Cadastrando...' : 'Cadastrar na lista de espera'}
+        {isSubmitting
+          ? isEditing
+            ? 'Salvando...'
+            : 'Cadastrando...'
+          : isEditing
+            ? 'Salvar alterações'
+            : 'Cadastrar na lista de espera'}
       </Button>
     </form>
   );

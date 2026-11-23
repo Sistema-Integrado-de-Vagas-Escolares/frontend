@@ -57,3 +57,17 @@ export async function cadastrarAlunoEscola(
     body: JSON.stringify(payload),
   });
 }
+
+export async function atualizarAlunoEscola(
+  token: string,
+  alunoId: string,
+  payload: CadastrarAlunoInscricaoRequest,
+): Promise<AlunoDetalhe> {
+  return apiRequest<AlunoDetalhe>(`/api/escola/alunos/${alunoId}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+}

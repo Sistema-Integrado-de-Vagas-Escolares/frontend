@@ -154,7 +154,10 @@ export function calcularPontuacaoEstimada(values: {
   return Math.min(100, pontos);
 }
 
-export function validateAlunoForm(values: AlunoFormValues):
+export function validateAlunoForm(
+  values: AlunoFormValues,
+  options?: { allowMaskedCpf?: boolean },
+):
   | { valid: true; payload: CadastrarAlunoInscricaoRequest }
   | { valid: false; errors: AlunoFormErrors } {
   const errors: AlunoFormErrors = {};
@@ -164,8 +167,10 @@ export function validateAlunoForm(values: AlunoFormValues):
     errors.nome = 'Informe o nome completo do aluno.';
   }
 
+  const isMaskedCpf =
+    Boolean(options?.allowMaskedCpf) && values.cpf.includes('*');
   const cpfDigits = values.cpf.replace(/\D/g, '');
-  if (cpfDigits.length !== 11) {
+  if (!isMaskedCpf && cpfDigits.length !== 11) {
     errors.cpf = 'Informe um CPF válido com 11 dígitos.';
   }
 
@@ -229,7 +234,7 @@ export function validateAlunoForm(values: AlunoFormValues):
     valid: true,
     payload: {
       nome,
-      cpf: formatCpf(cpfDigits),
+      cpf: isMaskedCpf ? values.cpf.trim() : formatCpf(cpfDigits),
       dataNascimento: isoDate,
       tipoVaga: values.tipoVaga,
       serieAno,

@@ -1,6 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { EmptyState } from '@/components/common/empty-state';
+import { ROUTES } from '@/constants/routes';
 import type { ResponsavelResumo } from '@/entities/responsavel';
 
 interface ResponsaveisListProps {
@@ -12,6 +15,8 @@ export function ResponsaveisList({
   responsaveis,
   isLoading,
 }: ResponsaveisListProps) {
+  const router = useRouter();
+
   if (isLoading) {
     return (
       <div className="py-12 text-center text-sm text-[#979799]">
@@ -44,10 +49,19 @@ export function ResponsaveisList({
             {responsaveis.map((responsavel) => (
               <tr
                 key={responsavel.id}
-                className="transition-colors hover:bg-[#f8fafd]"
+                onClick={() =>
+                  router.push(ROUTES.RESPONSAVEL_DETALHE(responsavel.id))
+                }
+                className="cursor-pointer transition-colors hover:bg-[#f8fafd]"
               >
                 <td className="px-5 py-4 text-[14px] font-semibold text-[#263238]">
-                  {responsavel.nome}
+                  <Link
+                    href={ROUTES.RESPONSAVEL_DETALHE(responsavel.id)}
+                    onClick={(event) => event.stopPropagation()}
+                    className="hover:text-[#3b5fe0]"
+                  >
+                    {responsavel.nome}
+                  </Link>
                 </td>
                 <td className="px-5 py-4 font-mono text-[12px] font-medium text-[#979799]">
                   {responsavel.cpf}
@@ -78,9 +92,10 @@ export function ResponsaveisList({
       {/* Mobile: Cards */}
       <div className="flex flex-col gap-[12px] md:hidden">
         {responsaveis.map((responsavel) => (
-          <div
+          <Link
             key={responsavel.id}
-            className="flex items-center gap-[12px] rounded-[16px] border border-[#e8edf8] bg-white p-[17px]"
+            href={ROUTES.RESPONSAVEL_DETALHE(responsavel.id)}
+            className="flex items-center gap-[12px] rounded-[16px] border border-[#e8edf8] bg-white p-[17px] transition-colors hover:border-[#3b5fe0]/40"
           >
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <p className="truncate text-[14px] font-semibold leading-[20px] text-[#263238]">
@@ -102,7 +117,7 @@ export function ResponsaveisList({
               height={16}
               className="size-[16px] shrink-0"
             />
-          </div>
+          </Link>
         ))}
       </div>
     </section>

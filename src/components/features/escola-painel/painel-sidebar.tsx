@@ -9,52 +9,51 @@ interface NavItem {
   label: string;
   href: string;
   icon: string;
+  invertIcon?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
   {
     label: 'Início',
-    href: ROUTES.ESCOLA.PAINEL,
+    href: ROUTES.HOME,
     icon: '/images/painel/nav-home.svg',
   },
   {
     label: 'Lista de Espera',
-    href: ROUTES.ESCOLA.LISTA_ESPERA,
+    href: ROUTES.LISTA_ESPERA,
     icon: '/images/painel/nav-waitlist.svg',
   },
   {
-    label: 'Gestão de Vagas',
-    href: ROUTES.ESCOLA.GESTAO_VAGAS,
+    label: 'Turmas',
+    href: ROUTES.TURMAS,
     icon: '/images/painel/nav-slots.svg',
   },
   {
+    label: 'Critérios de Fila',
+    href: ROUTES.CRITERIOS,
+    icon: '/images/painel/criterios/sliders-blue.svg',
+    invertIcon: true,
+  },
+  {
     label: 'Histórico',
-    href: ROUTES.ESCOLA.HISTORICO,
+    href: ROUTES.HISTORICO,
     icon: '/images/painel/nav-history.svg',
   },
   {
     label: 'Responsáveis',
-    href: ROUTES.ESCOLA.RESPONSAVEIS,
+    href: ROUTES.RESPONSAVEIS,
     icon: '/images/painel/nav-guardians.svg',
   },
   {
     label: 'Alunos',
-    href: ROUTES.ESCOLA.ALUNOS,
+    href: ROUTES.ALUNOS,
     icon: '/images/painel/nav-students.svg',
-  },
-  {
-    label: 'Buscar por CPF',
-    href: ROUTES.ESCOLA.BUSCAR_CPF,
-    icon: '/images/painel/nav-search.svg',
   },
 ];
 
 interface PainelSidebarProps {
   escolaNome: string;
   escolaCidade: string;
-  totalEmEspera: number | null;
-  vagasDisponiveis: number | null;
-  capacidadeTotal: number | null;
   onLogout: () => void;
   onNavigate?: () => void;
 }
@@ -62,66 +61,27 @@ interface PainelSidebarProps {
 export function PainelSidebar({
   escolaNome,
   escolaCidade,
-  totalEmEspera,
-  vagasDisponiveis,
-  capacidadeTotal,
   onLogout,
   onNavigate,
 }: PainelSidebarProps) {
   const pathname = usePathname();
 
-  const kpis = [
-    { label: 'Espera', value: totalEmEspera },
-    { label: 'Vagas', value: vagasDisponiveis },
-    { label: 'Capacidade', value: capacidadeTotal },
-  ];
-
   return (
     <aside className="flex h-full w-[288px] flex-col bg-[#3b5fe0]">
-      <div className="border-b border-white/15 px-[20px] pb-[21px] pt-[20px]">
-        <div className="flex items-center gap-[12px] pb-[4px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/logo-sive-s.png"
-            alt="Logo SIVE"
-            width={37}
-            height={56}
-            className="h-[56px] w-[37px] shrink-0 object-contain"
-          />
-          <div className="min-w-0 flex-1 pt-[4px]">
-            <p className="break-words text-[16px] font-bold leading-snug tracking-[-0.1504px] text-white">
-              {escolaNome}
-            </p>
-            <p className="truncate text-[12px] font-normal leading-[16px] text-white/60">
-              {escolaCidade}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-b border-white/15 px-[16px] py-[12px]">
-        <div className="grid grid-cols-3 gap-[8px]">
-          {kpis.map((kpi) => (
-            <div
-              key={kpi.label}
-              className="flex h-[66px] flex-col items-center justify-center rounded-[14px] bg-white/10 p-[10px]"
-            >
-              <p className="text-[20px] font-bold leading-[28px] tracking-[-0.4492px] text-white">
-                {kpi.value !== null ? kpi.value : '—'}
-              </p>
-              <p className="pt-[2px] text-[12px] font-normal leading-[16px] text-white/45">
-                {kpi.label}
-              </p>
-            </div>
-          ))}
-        </div>
+      <div className="border-b border-white/15 px-[20px] py-[18px]">
+        <p className="break-words text-[16px] font-bold leading-snug tracking-[-0.1504px] text-white">
+          {escolaNome}
+        </p>
+        <p className="mt-[2px] truncate text-[12px] font-normal leading-[16px] text-white/60">
+          {escolaCidade}
+        </p>
       </div>
 
       <nav aria-label="Menu do painel" className="flex-1 overflow-y-auto p-[12px]">
         <ul className="flex flex-col gap-[4px]">
           {NAV_ITEMS.map((item) => {
             const isActive =
-              item.href === ROUTES.ESCOLA.PAINEL
+              item.href === ROUTES.HOME
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
 
@@ -145,6 +105,7 @@ export function PainelSidebar({
                     height={16}
                     className={cn(
                       'size-[16px] shrink-0',
+                      item.invertIcon && 'brightness-0 invert',
                       !isActive && 'opacity-70',
                     )}
                   />

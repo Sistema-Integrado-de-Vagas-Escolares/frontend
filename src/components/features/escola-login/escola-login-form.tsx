@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginEscola, saveEscolaSession } from '@/api/auth/login';
+import {
+  getEscolaSession,
+  loginEscola,
+  saveEscolaSession,
+} from '@/api/auth/login';
 import { ApiError } from '@/api/utils/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +26,12 @@ export function EscolaLoginForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (getEscolaSession()?.token) {
+      router.replace(ROUTES.HOME);
+    }
+  }, [router]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError(null);
@@ -38,7 +48,7 @@ export function EscolaLoginForm() {
     try {
       const session = await loginEscola(validation.normalized);
       saveEscolaSession(session);
-      router.push(ROUTES.ESCOLA.PAINEL);
+      router.replace(ROUTES.HOME);
     } catch (error) {
       if (error instanceof ApiError) {
         setSubmitError(error.message);

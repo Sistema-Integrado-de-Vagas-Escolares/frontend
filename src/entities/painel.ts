@@ -7,4 +7,5 @@ export interface ResumoPainelEscola {
   capacidadeTotal: number;
   totalResponsaveis: number;
   totalAlunos: number;
+  totalMatriculados: number;
 }

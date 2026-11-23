@@ -22,7 +22,7 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
   const loadResumo = useCallback(async () => {
     const session = getEscolaSession();
     if (!session?.token) {
-      router.replace(ROUTES.ESCOLA.LOGIN);
+      router.replace(ROUTES.LOGIN);
       return;
     }
 
@@ -36,7 +36,7 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         clearEscolaSession();
-        router.replace(ROUTES.ESCOLA.LOGIN);
+        router.replace(ROUTES.LOGIN);
         return;
       }
       setError(
@@ -55,7 +55,7 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
 
   function handleLogout() {
     clearEscolaSession();
-    router.replace(ROUTES.ESCOLA.LOGIN);
+    router.replace(ROUTES.LOGIN);
   }
 
   if (!escola && isLoading) {
@@ -110,11 +110,6 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
           <PainelSidebar
             escolaNome={escola.nome}
             escolaCidade={escola.cidade}
-            totalEmEspera={resumo ? resumo.totalEmEspera : null}
-            vagasDisponiveis={resumo ? resumo.vagasDisponiveis : null}
-            capacidadeTotal={
-              resumo ? resumo.capacidadeTotal : escola.capacidadeTotal
-            }
             onLogout={handleLogout}
           />
         </div>
@@ -126,11 +121,6 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
               <PainelSidebar
                 escolaNome={escola.nome}
                 escolaCidade={escola.cidade}
-                totalEmEspera={resumo ? resumo.totalEmEspera : null}
-                vagasDisponiveis={resumo ? resumo.vagasDisponiveis : null}
-                capacidadeTotal={
-                  resumo ? resumo.capacidadeTotal : escola.capacidadeTotal
-                }
                 onLogout={handleLogout}
                 onNavigate={() => setIsMobileMenuOpen(false)}
               />

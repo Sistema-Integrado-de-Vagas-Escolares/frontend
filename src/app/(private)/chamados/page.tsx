@@ -9,6 +9,7 @@ import {
 } from '@/api/escola/use-inscricoes';
 import { ApiError } from '@/api/utils/api';
 import { BackLink } from '@/components/common/back-link';
+import { ConfirmDialog } from '@/components/common/confirm-dialog';
 import { EmptyState } from '@/components/common/empty-state';
 import { FilterBar, type FilterBarOption } from '@/components/common/filter-bar';
 import { PageHeader } from '@/components/common/page-header';
@@ -43,6 +44,8 @@ export default function ListaDeEsperaPage() {
   });
 
   const [callingId, setCallingId] = useState<string | null>(null);
+  const [inscricaoParaChamar, setInscricaoParaChamar] =
+    useState<InscricaoEscolaResumo | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   const [chamadoSelecionado, setChamadoSelecionado] =
@@ -117,7 +120,9 @@ export default function ListaDeEsperaPage() {
     try {
       await chamarMutation.mutateAsync(inscricaoId);
       await refreshResumo();
+      setInscricaoParaChamar(null);
     } catch (err) {
+      setInscricaoParaChamar(null);
       if (err instanceof ApiError && err.status === 401) {
         return;
       }
@@ -171,7 +176,12 @@ export default function ListaDeEsperaPage() {
       <ProximoFilaCard
         proximo={proximoDaFila}
         isCalling={callingId !== null && callingId === proximoDaFila?.id}
-        onChamarProximo={(id) => void handleChamar(id)}
+        onChamarProximo={(id) => {
+          if (proximoDaFila && proximoDaFila.id === id) {
+            setActionError(null);
+            setInscricaoParaChamar(proximoDaFila);
+          }
+        }}
       />
 
       <ListaEsperaTabs
@@ -215,13 +225,34 @@ export default function ListaDeEsperaPage() {
           itens={itens}
           showPosicao={activeTab !== 'MATRICULADO'}
           callingId={callingId}
-          onChamar={(id) => void handleChamar(id)}
+          onChamar={(id) => {
+            const selecionada = itens.find((item) => item.id === id) ?? null;
+            if (selecionada) {
+              setActionError(null);
+              setInscricaoParaChamar(selecionada);
+            }
+          }}
           onGerenciarChamado={(selecionado) => {
             setModalError(null);
             setChamadoSelecionado(selecionado);
           }}
         />
       )}
+
+      {inscricaoParaChamar ? (
+        <ConfirmDialog
+          title="Confirmar chamada do aluno?"
+          description={`Ao confirmar, ${inscricaoParaChamar.alunoNome} (${inscricaoParaChamar.etapaOuTurma}) será chamado(a) para matrícula e passará para a aba "Aguardando matrícula".`}
+          confirmLabel="Confirmar chamada"
+          isConfirming={callingId === inscricaoParaChamar.id}
+          onCancel={() => {
+            if (!callingId) {
+              setInscricaoParaChamar(null);
+            }
+          }}
+          onConfirm={() => void handleChamar(inscricaoParaChamar.id)}
+        />
+      ) : null}
 
       {chamadoSelecionado ? (
         <GerenciarChamadoModal

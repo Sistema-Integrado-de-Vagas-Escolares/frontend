@@ -12,8 +12,10 @@ import { listarResponsaveisEscola } from '@/api/escola/responsaveis';
 import { alunosKeys } from '@/api/escola/use-alunos';
 import { inscricoesKeys } from '@/api/escola/use-inscricoes';
 import { ApiError } from '@/api/utils/api';
+import { AccordionSection } from '@/components/common/accordion-section';
+import { AlunoInscricaoSucessoModal } from '@/components/features/alunos/aluno-inscricao-sucesso-modal';
 import { usePainel } from '@/components/features/escola-painel/painel-context';
-import { Button } from '@/components/ui/button';
+import { Select } from '@/components/ui/select';
 import {
   calcularNivelPorDataNascimentoBr,
   getNiveisPorTipoVaga,
@@ -49,6 +51,13 @@ type CriterioToggleKey =
   | 'bpcLoas'
   | 'temNecessidadeEspecial'
   | 'irmaoMatriculado';
+
+type AlunoFormSection =
+  | 'dados'
+  | 'vaga'
+  | 'endereco'
+  | 'criterios'
+  | 'responsaveis';
 
 const CRITERIOS_TOGGLES: {
   key: CriterioToggleKey;
@@ -108,6 +117,8 @@ interface ResponsavelVinculadoItem {
 interface AlunoFormProps {
   initialAluno?: AlunoDetalhe;
   redirectToAfterSave?: string;
+  formId?: string;
+  onSubmittingChange?: (isSubmitting: boolean) => void;
 }
 
 function formatRendaInitial(value?: number | null): string {
@@ -118,6 +129,8 @@ function formatRendaInitial(value?: number | null): string {
 export function AlunoForm({
   initialAluno,
   redirectToAfterSave,
+  formId = 'aluno-form',
+  onSubmittingChange,
 }: AlunoFormProps) {
   const isEditing = Boolean(initialAluno);
   const router = useRouter();
@@ -131,7 +144,11 @@ export function AlunoForm({
     getNiveisPorTipoVaga(initialTipoVaga)[0];
 
   const [nome, setNome] = useState(initialAluno?.nome ?? '');
-  const [cpf, setCpf] = useState(initialAluno?.cpf ?? '');
+  const [cpf, setCpf] = useState(() => {
+    const rawCpf = initialAluno?.cpf ?? '';
+    if (!rawCpf) return '';
+    return rawCpf.includes('*') ? rawCpf : formatCpf(rawCpf);
+  });
   const [dataNascimento, setDataNascimento] = useState(
     initialAluno?.dataNascimento
       ? formatIsoDateToBr(initialAluno.dataNascimento)
@@ -188,7 +205,38 @@ export function AlunoForm({
   const [nivelSugerido, setNivelSugerido] =
     useState<SugestaoNivelPorNascimento | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [inscricaoCriada, setInscricaoCriada] = useState<{
+    nome: string;
+    protocolo: string;
+  } | null>(null);
+  const [expandedSections, setExpandedSections] = useState<
+    Record<AlunoFormSection, boolean>
+  >({
+    dados: true,
+    vaga: false,
+    endereco: false,
+    criterios: false,
+    responsaveis: false,
+  });
+
+  function toggleSection(section: AlunoFormSection) {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  }
+
+  const hasDadosError = Boolean(
+    fieldErrors.nome || fieldErrors.cpf || fieldErrors.dataNascimento,
+  );
+  const hasVagaError = Boolean(fieldErrors.serieAno);
+  const hasEnderecoError = Boolean(
+    fieldErrors.cep ||
+      fieldErrors.rua ||
+      fieldErrors.numero ||
+      fieldErrors.bairro ||
+      fieldErrors.cidade ||
+      fieldErrors.estado,
+  );
+  const hasCriteriosError = Boolean(fieldErrors.rendaPerCapita);
+  const hasResponsaveisError = Boolean(fieldErrors.responsaveis);
 
   const pontuacaoEstimada = calcularPontuacaoEstimada({
     rendaPerCapita,
@@ -337,7 +385,26 @@ export function AlunoForm({
     );
 
     if (!validation.valid) {
-      setFieldErrors(validation.errors);
+      const errs = validation.errors;
+      setFieldErrors(errs);
+      setExpandedSections((prev) => ({
+        ...prev,
+        dados:
+          prev.dados || Boolean(errs.nome || errs.cpf || errs.dataNascimento),
+        vaga: prev.vaga || Boolean(errs.serieAno),
+        endereco:
+          prev.endereco ||
+          Boolean(
+            errs.cep ||
+              errs.rua ||
+              errs.numero ||
+              errs.bairro ||
+              errs.cidade ||
+              errs.estado,
+          ),
+        criterios: prev.criterios || Boolean(errs.rendaPerCapita),
+        responsaveis: prev.responsaveis || Boolean(errs.responsaveis),
+      }));
       return;
     }
 
@@ -348,7 +415,7 @@ export function AlunoForm({
     }
 
     setFieldErrors({});
-    setIsSubmitting(true);
+    onSubmittingChange?.(true);
 
     try {
       if (isEditing && initialAluno) {
@@ -367,13 +434,23 @@ export function AlunoForm({
           redirectToAfterSave ?? ROUTES.ALUNO_DETALHE(initialAluno.id),
         );
       } else {
-        await cadastrarAlunoEscola(session.token, validation.payload);
+        const criado = await cadastrarAlunoEscola(
+          session.token,
+          validation.payload,
+        );
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: alunosKeys.all }),
           queryClient.invalidateQueries({ queryKey: inscricoesKeys.all }),
           refreshResumo(),
         ]);
-        router.push(ROUTES.ALUNOS);
+        if (criado.protocolo) {
+          setInscricaoCriada({
+            nome: criado.nome,
+            protocolo: criado.protocolo,
+          });
+        } else {
+          router.push(ROUTES.ALUNOS);
+        }
       }
     } catch (error) {
       if (error instanceof ApiError) {
@@ -391,23 +468,34 @@ export function AlunoForm({
         );
       }
     } finally {
-      setIsSubmitting(false);
+      onSubmittingChange?.(false);
     }
   }
 
   return (
-    <form
+    <>
+      <form
+      id={formId}
       onSubmit={handleSubmit}
       noValidate
-      className="flex w-full max-w-[448px] flex-col gap-[16px] pt-[24px]"
+      className="flex w-full flex-col gap-[16px] pt-[24px]"
     >
       {/* Card 1: Dados do aluno */}
-      <section className="flex flex-col rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
-        <h2 className="text-[12px] font-bold uppercase leading-[16px] tracking-[0.6px] text-[#5e6062]">
-          Dados do aluno
-        </h2>
-
-        <div className="flex flex-col pt-[16px]">
+      <AccordionSection
+        title="Dados do aluno"
+        subtitle="Nome completo, CPF e data de nascimento"
+        badge={
+          nome.trim() ? (
+            <span className="hidden rounded-full bg-[#f0f4ff] px-[10px] py-[4px] text-[12px] font-medium text-[#5e6062] sm:inline-block">
+              {nome.trim()}
+            </span>
+          ) : null
+        }
+        hasError={hasDadosError}
+        isExpanded={expandedSections.dados}
+        onToggle={() => toggleSection('dados')}
+      >
+        <div className="flex flex-col">
           <label
             htmlFor="aluno-nome"
             className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
@@ -433,242 +521,153 @@ export function AlunoForm({
           ) : null}
         </div>
 
-        <div className="flex flex-col pt-[16px]">
-          <label
-            htmlFor="aluno-cpf"
-            className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
-          >
-            CPF do aluno
-          </label>
-          <input
-            id="aluno-cpf"
-            type="text"
-            inputMode="numeric"
-            placeholder="000.000.000-00"
-            value={cpf}
-            onChange={(event) => {
-              setCpf(formatCpf(event.target.value));
-              if (fieldErrors.cpf) {
-                setFieldErrors((prev) => ({ ...prev, cpf: undefined }));
-              }
-            }}
-            aria-invalid={Boolean(fieldErrors.cpf)}
-            className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-          />
-          {fieldErrors.cpf ? (
-            <p className="pt-1 text-xs text-red-600">{fieldErrors.cpf}</p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col pt-[16px]">
-          <label
-            htmlFor="aluno-nascimento"
-            className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
-          >
-            Data de nascimento
-          </label>
-          <input
-            id="aluno-nascimento"
-            type="text"
-            inputMode="numeric"
-            placeholder="DD/MM/AAAA"
-            value={dataNascimento}
-            onChange={(event) => {
-              const formatted = formatDataBrInput(event.target.value);
-              setDataNascimento(formatted);
-              if (fieldErrors.dataNascimento) {
-                setFieldErrors((prev) => ({
-                  ...prev,
-                  dataNascimento: undefined,
-                }));
-              }
-              const sugestao = calcularNivelPorDataNascimentoBr(formatted);
-              setNivelSugerido(sugestao);
-              if (sugestao) {
-                setTipoVaga(sugestao.tipoVaga);
-                setSerieAno(sugestao.serieAno);
-                if (fieldErrors.serieAno) {
-                  setFieldErrors((prev) => ({ ...prev, serieAno: undefined }));
+        <div className="grid grid-cols-1 gap-[16px] pt-[16px] md:grid-cols-2">
+          <div className="flex flex-col">
+            <label
+              htmlFor="aluno-cpf"
+              className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
+            >
+              CPF do aluno
+            </label>
+            <input
+              id="aluno-cpf"
+              type="text"
+              inputMode="numeric"
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(event) => {
+                setCpf(formatCpf(event.target.value));
+                if (fieldErrors.cpf) {
+                  setFieldErrors((prev) => ({ ...prev, cpf: undefined }));
                 }
-              }
-            }}
-            aria-invalid={Boolean(fieldErrors.dataNascimento)}
-            className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-          />
-          {fieldErrors.dataNascimento ? (
-            <p className="pt-1 text-xs text-red-600">
-              {fieldErrors.dataNascimento}
-            </p>
-          ) : null}
-        </div>
+              }}
+              aria-invalid={Boolean(fieldErrors.cpf)}
+              className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
+            />
+            {fieldErrors.cpf ? (
+              <p className="pt-1 text-xs text-red-600">{fieldErrors.cpf}</p>
+            ) : null}
+          </div>
 
-        <div className="flex flex-col pt-[16px]">
-          <span className="text-[12px] font-semibold leading-[16px] text-[#5e6062]">
-            Tipo de vaga
-          </span>
-          <div className="grid grid-cols-2 gap-[8px] pt-[8px]">
-            {(
-              [
-                { label: 'Creche', value: 'CRECHE' },
-                { label: 'Fundamental', value: 'FUNDAMENTAL' },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  setTipoVaga(option.value);
-                  const niveis = getNiveisPorTipoVaga(option.value);
-                  setSerieAno(niveis[0] ?? '');
+          <div className="flex flex-col">
+            <label
+              htmlFor="aluno-nascimento"
+              className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
+            >
+              Data de nascimento
+            </label>
+            <input
+              id="aluno-nascimento"
+              type="text"
+              inputMode="numeric"
+              placeholder="DD/MM/AAAA"
+              value={dataNascimento}
+              onChange={(event) => {
+                const formatted = formatDataBrInput(event.target.value);
+                setDataNascimento(formatted);
+                if (fieldErrors.dataNascimento) {
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    dataNascimento: undefined,
+                  }));
+                }
+                const sugestao = calcularNivelPorDataNascimentoBr(formatted);
+                setNivelSugerido(sugestao);
+                if (sugestao) {
+                  setTipoVaga(sugestao.tipoVaga);
+                  setSerieAno(sugestao.serieAno);
                   if (fieldErrors.serieAno) {
                     setFieldErrors((prev) => ({ ...prev, serieAno: undefined }));
                   }
-                }}
-                className={cn(
-                  'h-[40px] cursor-pointer rounded-[14px] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] transition-colors',
-                  tipoVaga === option.value
-                    ? 'bg-[#3b5fe0] text-white'
-                    : 'bg-[#f0f4ff] text-[#5e6062] hover:bg-[#e4ebff]',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col pt-[16px]">
-          <label
-            htmlFor="aluno-nivel"
-            className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
-          >
-            Nível escolar
-          </label>
-          <select
-            id="aluno-nivel"
-            value={serieAno}
-            onChange={(event) => {
-              setSerieAno(event.target.value);
-              if (fieldErrors.serieAno) {
-                setFieldErrors((prev) => ({ ...prev, serieAno: undefined }));
-              }
-            }}
-            aria-invalid={Boolean(fieldErrors.serieAno)}
-            className="mt-[6px] h-[44px] w-full cursor-pointer rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-          >
-            {getNiveisPorTipoVaga(tipoVaga).map((nivel) => (
-              <option key={nivel} value={nivel}>
-                {nivel}
-              </option>
-            ))}
-          </select>
-          {fieldErrors.serieAno ? (
-            <p className="pt-1 text-xs text-red-600">{fieldErrors.serieAno}</p>
-          ) : null}
-
-          {nivelSugerido ? (
-            <p
-              className={cn(
-                'pt-[6px] text-[11px] leading-[15px]',
-                nivelSugerido.serieAno === serieAno
-                  ? 'text-[#3b5fe0]'
-                  : 'text-amber-700',
-              )}
-            >
-              {nivelSugerido.serieAno === serieAno
-                ? `Pré-selecionado pela regra do MEC (corte 31/03/${nivelSugerido.anoLetivo}). Você pode ajustar manualmente se necessário.`
-                : `Pela idade em 31/03/${nivelSugerido.anoLetivo} (${nivelSugerido.idadeNoCorte} anos), o nível padrão seria ${nivelSugerido.serieAno}.`}
-            </p>
-          ) : null}
-
-          {NIVEIS_MEC_INFO[serieAno] ? (
-            <div className="mt-[8px] rounded-[12px] border border-[#e8edf8] bg-[#f8fafd] p-[12px]">
-              <div className="flex flex-wrap items-center gap-[6px]">
-                <span className="text-[12px] font-semibold text-[#263238]">
-                  {NIVEIS_MEC_INFO[serieAno].etapa}
-                </span>
-                <span
-                  className={cn(
-                    'rounded-full px-[8px] py-[2px] text-[11px] font-medium',
-                    NIVEIS_MEC_INFO[serieAno].matriculaObrigatoria
-                      ? 'bg-[#eef2ff] text-[#3b5fe0]'
-                      : 'bg-white text-[#5e6062]',
-                  )}
-                >
-                  {NIVEIS_MEC_INFO[serieAno].matriculaObrigatoria
-                    ? 'Matrícula obrigatória por lei'
-                    : 'Matrícula opcional'}
-                </span>
-              </div>
-              <p className="pt-[4px] text-[11px] font-medium text-[#5e6062]">
-                Faixa etária: {NIVEIS_MEC_INFO[serieAno].faixaEtaria}
-              </p>
-              <p className="pt-[2px] text-[11px] leading-[15px] text-[#979799]">
-                Foco pedagógico: {NIVEIS_MEC_INFO[serieAno].focoPedagogico}
-              </p>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col pt-[16px]">
-          <span className="text-[12px] font-semibold leading-[16px] text-[#5e6062]">
-            Período solicitado
-          </span>
-          <div className="grid grid-cols-3 gap-[8px] pt-[8px]">
-            {(
-              [
-                { label: 'Integral', value: 'INTEGRAL' },
-                { label: 'Manhã', value: 'MANHA' },
-                { label: 'Tarde', value: 'TARDE' },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setTurno(option.value)}
-                className={cn(
-                  'h-[40px] cursor-pointer rounded-[14px] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] transition-colors',
-                  turno === option.value
-                    ? 'bg-[#3b5fe0] text-white'
-                    : 'bg-[#f0f4ff] text-[#5e6062] hover:bg-[#e4ebff]',
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-[12px] pt-[16px]">
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="aluno-cep"
-                className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
-              >
-                CEP
-              </label>
-              {isFetchingCep ? (
-                <span className="text-[11px] font-medium text-[#3b5fe0]">
-                  Buscando CEP...
-                </span>
-              ) : null}
-            </div>
-            <input
-              id="aluno-cep"
-              type="text"
-              inputMode="numeric"
-              placeholder="00000-000"
-              value={cep}
-              onChange={(event) => void handleCepChange(event.target.value)}
-              aria-invalid={Boolean(fieldErrors.cep)}
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.dataNascimento)}
               className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
             />
-            {fieldErrors.cep ? (
-              <p className="pt-1 text-xs text-red-600">{fieldErrors.cep}</p>
-            ) : cepMessage ? (
-              <p className="pt-1 text-xs text-amber-700">{cepMessage}</p>
+            {fieldErrors.dataNascimento ? (
+              <p className="pt-1 text-xs text-red-600">
+                {fieldErrors.dataNascimento}
+              </p>
             ) : null}
+          </div>
+        </div>
+      </AccordionSection>
+
+      {/* Card 2: Endereço residencial */}
+      <AccordionSection
+        title="Endereço residencial"
+        subtitle="Usado para calcular a distância até a escola solicitada"
+        badge={
+          cidade.trim() && estado.trim() ? (
+            <span className="hidden rounded-full bg-[#f0f4ff] px-[10px] py-[4px] text-[12px] font-medium text-[#5e6062] sm:inline-block">
+              {cidade.trim()}/{estado.trim()}
+            </span>
+          ) : null
+        }
+        hasError={hasEnderecoError}
+        isExpanded={expandedSections.endereco}
+        onToggle={() => toggleSection('endereco')}
+      >
+        <div className="flex flex-col gap-[12px]">
+          <div className="grid grid-cols-1 gap-[12px] md:grid-cols-2">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="aluno-cep"
+                  className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
+                >
+                  CEP
+                </label>
+                {isFetchingCep ? (
+                  <span className="text-[11px] font-medium text-[#3b5fe0]">
+                    Buscando CEP...
+                  </span>
+                ) : null}
+              </div>
+              <input
+                id="aluno-cep"
+                type="text"
+                inputMode="numeric"
+                placeholder="00000-000"
+                value={cep}
+                onChange={(event) => void handleCepChange(event.target.value)}
+                aria-invalid={Boolean(fieldErrors.cep)}
+                className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
+              />
+              {fieldErrors.cep ? (
+                <p className="pt-1 text-xs text-red-600">{fieldErrors.cep}</p>
+              ) : cepMessage ? (
+                <p className="pt-1 text-xs text-amber-700">{cepMessage}</p>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col">
+              <label
+                htmlFor="aluno-bairro"
+                className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
+              >
+                Bairro
+              </label>
+              <input
+                id="aluno-bairro"
+                type="text"
+                placeholder="Nome do bairro"
+                value={bairro}
+                onChange={(event) => {
+                  setBairro(event.target.value);
+                  if (fieldErrors.bairro) {
+                    setFieldErrors((prev) => ({ ...prev, bairro: undefined }));
+                  }
+                }}
+                aria-invalid={Boolean(fieldErrors.bairro)}
+                className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
+              />
+              {fieldErrors.bairro ? (
+                <p className="pt-1 text-xs text-red-600">
+                  {fieldErrors.bairro}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -720,7 +719,9 @@ export function AlunoForm({
                 className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
               />
               {fieldErrors.numero ? (
-                <p className="pt-1 text-xs text-red-600">{fieldErrors.numero}</p>
+                <p className="pt-1 text-xs text-red-600">
+                  {fieldErrors.numero}
+                </p>
               ) : null}
             </div>
 
@@ -740,32 +741,6 @@ export function AlunoForm({
                 className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
               />
             </div>
-          </div>
-
-          <div className="flex flex-col">
-            <label
-              htmlFor="aluno-bairro"
-              className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
-            >
-              Bairro
-            </label>
-            <input
-              id="aluno-bairro"
-              type="text"
-              placeholder="Nome do bairro"
-              value={bairro}
-              onChange={(event) => {
-                setBairro(event.target.value);
-                if (fieldErrors.bairro) {
-                  setFieldErrors((prev) => ({ ...prev, bairro: undefined }));
-                }
-              }}
-              aria-invalid={Boolean(fieldErrors.bairro)}
-              className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-            />
-            {fieldErrors.bairro ? (
-              <p className="pt-1 text-xs text-red-600">{fieldErrors.bairro}</p>
-            ) : null}
           </div>
 
           <div className="grid grid-cols-1 gap-[12px] sm:grid-cols-3">
@@ -791,7 +766,9 @@ export function AlunoForm({
                 className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
               />
               {fieldErrors.cidade ? (
-                <p className="pt-1 text-xs text-red-600">{fieldErrors.cidade}</p>
+                <p className="pt-1 text-xs text-red-600">
+                  {fieldErrors.cidade}
+                </p>
               ) : null}
             </div>
 
@@ -818,29 +795,187 @@ export function AlunoForm({
                 className="mt-[6px] h-[44px] w-full rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] uppercase tracking-[-0.1504px] text-[#263238] placeholder:text-[#bfc5d2] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
               />
               {fieldErrors.estado ? (
-                <p className="pt-1 text-xs text-red-600">{fieldErrors.estado}</p>
+                <p className="pt-1 text-xs text-red-600">
+                  {fieldErrors.estado}
+                </p>
               ) : null}
             </div>
           </div>
-
-          <p className="text-[12px] leading-[16px] text-[#979799]">
-            Usado para calcular a distância até a escola solicitada.
-          </p>
         </div>
-      </section>
+      </AccordionSection>
 
-      {/* Card 2: Critérios de pontuação */}
-      <section className="flex flex-col rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[12px] font-bold uppercase leading-[16px] tracking-[0.6px] text-[#5e6062]">
-            Critérios de pontuação
-          </h2>
-          <span className="rounded-[14px] bg-[#3b5fe0] px-[12px] py-[6px] text-[12px] font-bold leading-[16px] text-white">
-            Score: {pontuacaoEstimada} / 100
+      {/* Card 3: Vaga solicitada */}
+      <AccordionSection
+        title="Vaga solicitada"
+        subtitle="Tipo de vaga, nível escolar e período"
+        badge={
+          <span className="hidden rounded-full bg-[#f0f4ff] px-[10px] py-[4px] text-[12px] font-medium text-[#3b5fe0] sm:inline-block">
+            {tipoVaga === 'CRECHE' ? 'Creche' : 'Fundamental'}
+            {serieAno ? ` · ${serieAno}` : ''}
           </span>
+        }
+        hasError={hasVagaError}
+        isExpanded={expandedSections.vaga}
+        onToggle={() => toggleSection('vaga')}
+      >
+        <div className="grid grid-cols-1 gap-[16px] md:grid-cols-2">
+          <div className="flex flex-col">
+            <span className="text-[12px] font-semibold leading-[16px] text-[#5e6062]">
+              Tipo de vaga
+            </span>
+            <div className="grid grid-cols-2 gap-[8px] pt-[8px]">
+              {(
+                [
+                  { label: 'Creche', value: 'CRECHE' },
+                  { label: 'Fundamental', value: 'FUNDAMENTAL' },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setTipoVaga(option.value);
+                    const niveis = getNiveisPorTipoVaga(option.value);
+                    setSerieAno(niveis[0] ?? '');
+                    if (fieldErrors.serieAno) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        serieAno: undefined,
+                      }));
+                    }
+                  }}
+                  className={cn(
+                    'h-[40px] cursor-pointer rounded-[14px] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] transition-colors',
+                    tipoVaga === option.value
+                      ? 'bg-[#3b5fe0] text-white'
+                      : 'bg-[#f0f4ff] text-[#5e6062] hover:bg-[#e4ebff]',
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            <span className="text-[12px] font-semibold leading-[16px] text-[#5e6062]">
+              Período solicitado
+            </span>
+            <div className="grid grid-cols-3 gap-[8px] pt-[8px]">
+              {(
+                [
+                  { label: 'Integral', value: 'INTEGRAL' },
+                  { label: 'Manhã', value: 'MANHA' },
+                  { label: 'Tarde', value: 'TARDE' },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTurno(option.value)}
+                  className={cn(
+                    'h-[40px] cursor-pointer rounded-[14px] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] transition-colors',
+                    turno === option.value
+                      ? 'bg-[#3b5fe0] text-white'
+                      : 'bg-[#f0f4ff] text-[#5e6062] hover:bg-[#e4ebff]',
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col pt-[16px]">
+          <label
+            htmlFor="aluno-nivel"
+            className="text-[12px] font-semibold leading-[16px] text-[#5e6062]"
+          >
+            Nível escolar
+          </label>
+          <Select
+            id="aluno-nivel"
+            value={serieAno}
+            onChange={(event) => {
+              setSerieAno(event.target.value);
+              if (fieldErrors.serieAno) {
+                setFieldErrors((prev) => ({ ...prev, serieAno: undefined }));
+              }
+            }}
+            aria-invalid={Boolean(fieldErrors.serieAno)}
+            wrapperClassName="mt-[6px]"
+            className="h-[44px] rounded-[14px] bg-[#f0f4ff] pl-[16px] text-[14px] tracking-[-0.1504px] text-[#263238] focus:ring-2 focus:ring-[#3b5fe0]"
+          >
+            {getNiveisPorTipoVaga(tipoVaga).map((nivel) => (
+              <option key={nivel} value={nivel}>
+                {nivel}
+              </option>
+            ))}
+          </Select>
+          {fieldErrors.serieAno ? (
+            <p className="pt-1 text-xs text-red-600">{fieldErrors.serieAno}</p>
+          ) : null}
+
+          {nivelSugerido ? (
+            <p
+              className={cn(
+                'pt-[6px] text-[11px] leading-[15px]',
+                nivelSugerido.serieAno === serieAno
+                  ? 'text-[#3b5fe0]'
+                  : 'text-amber-700',
+              )}
+            >
+              {nivelSugerido.serieAno === serieAno
+                ? `Pré-selecionado pela regra do MEC (corte 31/03/${nivelSugerido.anoLetivo}). Você pode ajustar manualmente se necessário.`
+                : `Pela idade em 31/03/${nivelSugerido.anoLetivo} (${nivelSugerido.idadeNoCorte} anos), o nível padrão seria ${nivelSugerido.serieAno}.`}
+            </p>
+          ) : null}
+
+          {NIVEIS_MEC_INFO[serieAno] ? (
+            <div className="mt-[8px] rounded-[12px] border border-[#e8edf8] bg-[#f8fafd] p-[12px]">
+              <div className="flex flex-wrap items-center gap-[6px]">
+                <span className="text-[12px] font-semibold text-[#263238]">
+                  {NIVEIS_MEC_INFO[serieAno].etapa}
+                </span>
+                <span
+                  className={cn(
+                    'rounded-full px-[8px] py-[2px] text-[11px] font-medium',
+                    NIVEIS_MEC_INFO[serieAno].matriculaObrigatoria
+                      ? 'bg-[#eef2ff] text-[#3b5fe0]'
+                      : 'bg-white text-[#5e6062]',
+                  )}
+                >
+                  {NIVEIS_MEC_INFO[serieAno].matriculaObrigatoria
+                    ? 'Matrícula obrigatória por lei'
+                    : 'Matrícula opcional'}
+                </span>
+              </div>
+              <p className="pt-[4px] text-[11px] font-medium text-[#5e6062]">
+                Faixa etária: {NIVEIS_MEC_INFO[serieAno].faixaEtaria}
+              </p>
+              <p className="pt-[2px] text-[11px] leading-[15px] text-[#979799]">
+                Foco pedagógico: {NIVEIS_MEC_INFO[serieAno].focoPedagogico}
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </AccordionSection>
+
+      {/* Card 4: Critérios de pontuação */}
+      <AccordionSection
+        title="Critérios de pontuação"
+        subtitle="Renda per capita e prioridades sociais"
+        badge={
+          <span className="rounded-[14px] bg-[#3b5fe0] px-[12px] py-[6px] text-[12px] font-bold leading-[16px] text-white">
+            Score: {pontuacaoEstimada} / 100
+          </span>
+        }
+        hasError={hasCriteriosError}
+        isExpanded={expandedSections.criterios}
+        onToggle={() => toggleSection('criterios')}
+      >
+        <div className="flex flex-col">
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor="aluno-renda"
@@ -954,16 +1089,24 @@ export function AlunoForm({
             * Distância calculada após confirmação do endereço
           </p>
         </div>
-      </section>
+      </AccordionSection>
 
-      {/* Card 3: Responsáveis vinculados */}
-      <section className="flex flex-col rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
-        <h2 className="text-[12px] font-bold uppercase leading-[16px] tracking-[0.6px] text-[#5e6062]">
-          Responsáveis vinculados ({vinculados.length})
-        </h2>
-
+      {/* Card 5: Responsáveis vinculados */}
+      <AccordionSection
+        title="Responsáveis vinculados"
+        subtitle="Vincule ao menos um responsável pelo CPF"
+        badge={
+          <span className="rounded-full bg-[#f0f4ff] px-[10px] py-[4px] text-[12px] font-semibold text-[#3b5fe0]">
+            {vinculados.length}{' '}
+            {vinculados.length === 1 ? 'vinculado' : 'vinculados'}
+          </span>
+        }
+        hasError={hasResponsaveisError}
+        isExpanded={expandedSections.responsaveis}
+        onToggle={() => toggleSection('responsaveis')}
+      >
         {vinculados.length > 0 ? (
-          <div className="flex flex-col gap-2 pt-[12px]">
+          <div className="flex flex-col gap-2">
             {vinculados.map((item) => (
               <div
                 key={item.responsavel.id}
@@ -978,7 +1121,7 @@ export function AlunoForm({
                   </p>
                 </div>
 
-                <select
+                <Select
                   aria-label={`Parentesco de ${item.responsavel.nome}`}
                   value={item.parentesco}
                   onChange={(event) => {
@@ -991,14 +1134,15 @@ export function AlunoForm({
                       ),
                     );
                   }}
-                  className="rounded-lg border border-[#e2e7f0] bg-white px-2 py-1 text-xs text-[#263238]"
+                  iconSize={14}
+                  className="rounded-lg border border-[#e2e7f0] bg-white py-1.5 pl-3 pr-[36px] text-xs text-[#263238] focus:ring-2 focus:ring-[#3b5fe0]"
                 >
                   {PARENTESCO_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
-                </select>
+                </Select>
 
                 <button
                   type="button"
@@ -1062,7 +1206,7 @@ export function AlunoForm({
             </p>
           ) : null}
         </div>
-      </section>
+      </AccordionSection>
 
       {submitError ? (
         <div
@@ -1072,20 +1216,15 @@ export function AlunoForm({
           {submitError}
         </div>
       ) : null}
-
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="h-[48px] w-full rounded-[14px] bg-[#3b5fe0] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] text-white hover:bg-[#3252c7]"
-      >
-        {isSubmitting
-          ? isEditing
-            ? 'Salvando...'
-            : 'Cadastrando...'
-          : isEditing
-            ? 'Salvar alterações'
-            : 'Cadastrar na lista de espera'}
-      </Button>
     </form>
+
+      {inscricaoCriada ? (
+        <AlunoInscricaoSucessoModal
+          nomeAluno={inscricaoCriada.nome}
+          protocolo={inscricaoCriada.protocolo}
+          onClose={() => router.push(ROUTES.ALUNOS)}
+        />
+      ) : null}
+    </>
   );
 }

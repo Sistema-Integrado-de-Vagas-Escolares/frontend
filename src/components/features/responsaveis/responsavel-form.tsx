@@ -4,12 +4,16 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { clearEscolaSession, getEscolaSession } from '@/api/auth/login';
-import { cadastrarResponsavelEscola } from '@/api/escola/responsaveis';
+import {
+  atualizarResponsavelEscola,
+  cadastrarResponsavelEscola,
+} from '@/api/escola/responsaveis';
 import { responsaveisKeys } from '@/api/escola/use-responsaveis';
 import { ApiError } from '@/api/utils/api';
 import { usePainel } from '@/components/features/escola-painel/painel-context';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/routes';
+import type { ResponsavelDetalhe } from '@/entities/responsavel';
 import {
   formatCpf,
   formatTelefone,
@@ -17,14 +21,24 @@ import {
   type ResponsavelFormErrors,
 } from '@/schemas/responsavel.schema';
 
-export function ResponsavelForm() {
+interface ResponsavelFormProps {
+  initialResponsavel?: ResponsavelDetalhe;
+  redirectToAfterSave?: string;
+}
+
+export function ResponsavelForm({
+  initialResponsavel,
+  redirectToAfterSave,
+}: ResponsavelFormProps = {}) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { refreshResumo } = usePainel();
 
-  const [nome, setNome] = useState('');
-  const [cpf, setCpf] = useState('');
-  const [telefone, setTelefone] = useState('');
+  const isEditing = Boolean(initialResponsavel);
+
+  const [nome, setNome] = useState(initialResponsavel?.nome ?? '');
+  const [cpf, setCpf] = useState(initialResponsavel?.cpf ?? '');
+  const [telefone, setTelefone] = useState(initialResponsavel?.telefone ?? '');
   const [fieldErrors, setFieldErrors] = useState<ResponsavelFormErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,11 +47,14 @@ export function ResponsavelForm() {
     event.preventDefault();
     setSubmitError(null);
 
-    const validation = validateResponsavelForm({
-      nome,
-      cpf,
-      telefone,
-    });
+    const validation = validateResponsavelForm(
+      {
+        nome,
+        cpf,
+        telefone,
+      },
+      { allowMaskedCpf: isEditing },
+    );
 
     if (!validation.valid) {
       setFieldErrors(validation.errors);
@@ -54,12 +71,32 @@ export function ResponsavelForm() {
     setIsSubmitting(true);
 
     try {
-      await cadastrarResponsavelEscola(session.token, validation.payload);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: responsaveisKeys.all }),
-        refreshResumo(),
-      ]);
-      router.push(ROUTES.RESPONSAVEIS);
+      if (isEditing && initialResponsavel) {
+        const updated = await atualizarResponsavelEscola(
+          session.token,
+          initialResponsavel.id,
+          validation.payload,
+        );
+        queryClient.setQueryData(
+          responsaveisKeys.detail(initialResponsavel.id),
+          updated,
+        );
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: responsaveisKeys.all }),
+          refreshResumo(),
+        ]);
+        router.push(
+          redirectToAfterSave ??
+            ROUTES.RESPONSAVEL_DETALHE(initialResponsavel.id),
+        );
+      } else {
+        await cadastrarResponsavelEscola(session.token, validation.payload);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: responsaveisKeys.all }),
+          refreshResumo(),
+        ]);
+        router.push(ROUTES.RESPONSAVEIS);
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
@@ -70,7 +107,9 @@ export function ResponsavelForm() {
         setSubmitError(error.message);
       } else {
         setSubmitError(
-          'Não foi possível cadastrar o responsável. Tente novamente.',
+          isEditing
+            ? 'Não foi possível atualizar o responsável. Tente novamente.'
+            : 'Não foi possível cadastrar o responsável. Tente novamente.',
         );
       }
     } finally {
@@ -192,7 +231,13 @@ export function ResponsavelForm() {
             disabled={isSubmitting}
             className="h-[48px] w-full rounded-[14px] bg-[#3b5fe0] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] text-white hover:bg-[#3252c7]"
           >
-            {isSubmitting ? 'Cadastrando...' : 'Cadastrar Responsável'}
+            {isSubmitting
+              ? isEditing
+                ? 'Salvando...'
+                : 'Cadastrando...'
+              : isEditing
+                ? 'Salvar alterações'
+                : 'Cadastrar Responsável'}
           </Button>
         </div>
       </form>

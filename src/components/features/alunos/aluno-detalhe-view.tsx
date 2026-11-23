@@ -20,7 +20,9 @@ export function AlunoDetalheView({
   backLabel,
   editHref,
 }: AlunoDetalheViewProps) {
-  const alunoQuery = useAlunoDetalheEscola(alunoId);
+  const alunoQuery = useAlunoDetalheEscola(alunoId, {
+    incluirCpfCompleto: true,
+  });
 
   const error =
     alunoQuery.error instanceof ApiError

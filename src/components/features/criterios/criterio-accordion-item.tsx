@@ -1,5 +1,6 @@
 'use client';
 
+import { Select } from '@/components/ui/select';
 import {
   TIPO_RESPOSTA_LABELS,
   TIPO_RESPOSTA_OPTIONS,
@@ -135,36 +136,26 @@ export function CriterioAccordionItem({
               <label className="text-[12px] font-semibold leading-[16px] text-[#5e6062]">
                 Tipo de resposta
               </label>
-              <div className="relative">
-                <select
-                  value={criterio.tipoResposta}
-                  onChange={(event) => {
-                    const tipoResposta = event.target
-                      .value as TipoRespostaCriterio;
-                    onChange({
-                      ...criterio,
-                      tipoResposta,
-                      categoria:
-                        tipoResposta === 'DISTANCIA' ? 'GEOGRAFICO' : 'SOCIAL',
-                    });
-                  }}
-                  className="h-[44px] w-full cursor-pointer appearance-none rounded-[14px] bg-[#f0f4ff] px-[16px] pr-10 text-[14px] text-[#263238] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-                >
-                  {TIPO_RESPOSTA_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/painel/chevron-down.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="pointer-events-none absolute right-[12px] top-1/2 size-[20px] -translate-y-1/2"
-                />
-              </div>
+              <Select
+                value={criterio.tipoResposta}
+                onChange={(event) => {
+                  const tipoResposta = event.target
+                    .value as TipoRespostaCriterio;
+                  onChange({
+                    ...criterio,
+                    tipoResposta,
+                    categoria:
+                      tipoResposta === 'DISTANCIA' ? 'GEOGRAFICO' : 'SOCIAL',
+                  });
+                }}
+                className="h-[44px] rounded-[14px] bg-[#f0f4ff] pl-[16px] text-[14px] text-[#263238] focus:ring-2 focus:ring-[#3b5fe0]"
+              >
+                {TIPO_RESPOSTA_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Select>
             </div>
           </div>
 

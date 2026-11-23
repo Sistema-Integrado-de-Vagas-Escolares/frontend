@@ -19,6 +19,7 @@ export interface AlunoResumo {
   turno: Turno | null;
   pontuacaoTotal: number;
   statusInscricao: string;
+  protocolo?: string | null;
 }
 
 export interface ResponsavelVinculoInput {

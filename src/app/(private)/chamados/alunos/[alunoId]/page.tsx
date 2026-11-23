@@ -14,9 +14,9 @@ export default function ListaEsperaAlunoDetalhePage({
   return (
     <AlunoDetalheView
       alunoId={alunoId}
-      backHref={ROUTES.LISTA_ESPERA}
-      backLabel="Voltar para Lista de Espera"
-      editHref={ROUTES.LISTA_ESPERA_ALUNO_EDITAR(alunoId)}
+      backHref={ROUTES.CHAMADOS}
+      backLabel="Voltar para Chamados"
+      editHref={ROUTES.CHAMADOS_ALUNO_EDITAR(alunoId)}
     />
   );
 }

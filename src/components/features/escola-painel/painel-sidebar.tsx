@@ -19,9 +19,9 @@ const NAV_ITEMS: NavItem[] = [
     icon: '/images/painel/nav-home.svg',
   },
   {
-    label: 'Lista de Espera',
-    href: ROUTES.LISTA_ESPERA,
-    icon: '/images/painel/nav-waitlist.svg',
+    label: 'Chamados',
+    href: ROUTES.CHAMADOS,
+    icon: '/images/painel/bell-white.svg',
   },
   {
     label: 'Turmas',
@@ -35,11 +35,6 @@ const NAV_ITEMS: NavItem[] = [
     invertIcon: true,
   },
   {
-    label: 'Histórico',
-    href: ROUTES.HISTORICO,
-    icon: '/images/painel/nav-history.svg',
-  },
-  {
     label: 'Responsáveis',
     href: ROUTES.RESPONSAVEIS,
     icon: '/images/painel/nav-guardians.svg',
@@ -47,7 +42,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Alunos',
     href: ROUTES.ALUNOS,
-    icon: '/images/painel/nav-students.svg',
+    icon: '/images/painel/nav-waitlist.svg',
   },
 ];
 

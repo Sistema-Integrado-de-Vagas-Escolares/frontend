@@ -7,7 +7,7 @@ export default function InscricaoMatriculaPage() {
     <>
       <div className="pb-[12px]">
         <Link
-          href={ROUTES.LISTA_ESPERA}
+          href={ROUTES.CHAMADOS}
           className="inline-flex items-center gap-[6px] text-[12px] font-medium leading-[16px] text-[#979799] transition-colors hover:text-[#263238]"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

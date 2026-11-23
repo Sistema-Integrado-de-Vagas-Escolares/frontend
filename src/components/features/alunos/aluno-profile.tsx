@@ -1,6 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { differenceInYears, format, isValid, parseISO } from 'date-fns';
+import { Check, Copy, Link2 } from 'lucide-react';
+import { CpfReveal } from '@/components/common/cpf-reveal';
+import { ROUTES } from '@/constants/routes';
 import type { AlunoDetalhe, Parentesco, Turno } from '@/entities/aluno';
 import { cn } from '@/lib/utils';
 
@@ -64,6 +68,9 @@ function formatCurrency(value?: number | null): string {
 }
 
 export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
+  const [copiedProtocol, setCopiedProtocol] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
   const statusInfo = aluno.statusInscricao
     ? (STATUS_STYLE[aluno.statusInscricao] ?? {
         label: aluno.statusInscricao,
@@ -71,6 +78,29 @@ export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
       })
     : null;
   const idade = formatIdade(aluno.dataNascimento);
+
+  async function handleCopyProtocol() {
+    if (!aluno.protocolo) return;
+    try {
+      await navigator.clipboard.writeText(aluno.protocolo);
+      setCopiedProtocol(true);
+      setTimeout(() => setCopiedProtocol(false), 2000);
+    } catch {
+      // Ignore clipboard failures
+    }
+  }
+
+  async function handleCopyTrackingLink() {
+    if (!aluno.protocolo) return;
+    try {
+      const url = `${window.location.origin}${ROUTES.CONSULTA_PROTOCOLO(aluno.protocolo)}`;
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      // Ignore clipboard failures
+    }
+  }
 
   const enderecoFormatado = aluno.endereco
     ? `${aluno.endereco.rua}, ${aluno.endereco.numero}${
@@ -104,9 +134,15 @@ export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
                 </span>
               ) : null}
             </div>
-            <p className="pt-[4px] text-[13px] text-[#687386]">
-              CPF: {aluno.cpf} · Nascimento: {formatDateBr(aluno.dataNascimento)}
-              {idade ? ` (${idade})` : ''}
+            <p className="flex flex-wrap items-center gap-x-[6px] pt-[4px] text-[13px] text-[#687386]">
+              <span className="inline-flex items-center gap-1">
+                <span>CPF:</span>
+                <CpfReveal cpf={aluno.cpf} />
+              </span>
+              <span>
+                · Nascimento: {formatDateBr(aluno.dataNascimento)}
+                {idade ? ` (${idade})` : ''}
+              </span>
             </p>
           </div>
 
@@ -123,14 +159,57 @@ export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
 
       {/* Inscrição e Turma */}
       <section className="rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
-        <h3 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
-          Inscrição na escola
-        </h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
+            Inscrição na escola
+          </h3>
+          {aluno.protocolo ? (
+            <button
+              type="button"
+              onClick={handleCopyTrackingLink}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-[10px] border border-[#dce4f7] bg-[#f8faff] px-3 py-1.5 text-[12px] font-semibold text-[#3b5fe0] transition-colors hover:bg-[#eef2ff]"
+            >
+              {copiedLink ? (
+                <>
+                  <Check className="size-3.5 text-[#007a55]" aria-hidden="true" />
+                  <span className="text-[#007a55]">Link copiado</span>
+                </>
+              ) : (
+                <>
+                  <Link2 className="size-3.5" aria-hidden="true" />
+                  <span>Copiar link de acompanhamento</span>
+                </>
+              )}
+            </button>
+          ) : null}
+        </div>
         <dl className="grid grid-cols-1 gap-[14px] pt-[14px] sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <dt className="text-[12px] text-[#979799]">Protocolo</dt>
-            <dd className="pt-[2px] text-[14px] font-semibold text-[#263238]">
-              {aluno.protocolo ?? '—'}
+            <dd className="flex items-center gap-1.5 pt-[2px] text-[14px] font-semibold text-[#263238]">
+              <span>{aluno.protocolo ?? '—'}</span>
+              {aluno.protocolo ? (
+                <button
+                  type="button"
+                  onClick={handleCopyProtocol}
+                  aria-label={
+                    copiedProtocol ? 'Protocolo copiado' : 'Copiar protocolo'
+                  }
+                  title={
+                    copiedProtocol ? 'Protocolo copiado' : 'Copiar protocolo'
+                  }
+                  className="inline-flex size-6 cursor-pointer items-center justify-center rounded-md text-[#687386] transition-colors hover:bg-[#eef2ff] hover:text-[#3b5fe0]"
+                >
+                  {copiedProtocol ? (
+                    <Check
+                      className="size-3.5 text-[#007a55]"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Copy className="size-3.5" aria-hidden="true" />
+                  )}
+                </button>
+              ) : null}
             </dd>
           </div>
           <div>
@@ -216,8 +295,9 @@ export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
                       </span>
                     ) : null}
                   </div>
-                  <p className="pt-[2px] text-[12px] text-[#979799]">
-                    CPF: {resp.cpf}
+                  <p className="flex items-center gap-1 pt-[2px] text-[12px] text-[#979799]">
+                    <span>CPF:</span>
+                    <CpfReveal cpf={resp.cpf} />
                   </p>
                 </div>
 

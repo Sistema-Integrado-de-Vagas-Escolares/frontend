@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { format, isValid, parseISO } from 'date-fns';
+import { CpfReveal } from '@/components/common/cpf-reveal';
 import { ROUTES } from '@/constants/routes';
 import type { Parentesco } from '@/entities/aluno';
 import type { ResponsavelDetalhe } from '@/entities/responsavel';
@@ -65,8 +66,8 @@ export function ResponsavelProfile({
           </div>
           <div>
             <dt className="text-[12px] text-[#979799]">CPF</dt>
-            <dd className="pt-[2px] font-mono text-[14px] font-medium text-[#263238]">
-              {responsavel.cpf}
+            <dd className="pt-[2px] text-[14px] font-medium text-[#263238]">
+              <CpfReveal cpf={responsavel.cpf} />
             </dd>
           </div>
           <div>
@@ -78,17 +79,17 @@ export function ResponsavelProfile({
         </dl>
       </section>
 
-      <section className="rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
+      <section className="flex flex-col gap-[12px]">
         <h2 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
           Filhos vinculados ({responsavel.filhos.length})
         </h2>
 
         {responsavel.filhos.length === 0 ? (
-          <p className="pt-[12px] text-sm text-[#979799]">
+          <p className="rounded-[16px] border border-[#e8edf8] bg-white p-[21px] text-sm text-[#979799]">
             Nenhum aluno vinculado a este responsável.
           </p>
         ) : (
-          <div className="flex flex-col gap-[10px] pt-[14px]">
+          <div className="flex flex-col gap-[10px]">
             {responsavel.filhos.map((filho) => {
               const statusInfo = filho.statusInscricao
                 ? (STATUS_STYLE[filho.statusInscricao] ?? {
@@ -104,14 +105,14 @@ export function ResponsavelProfile({
                     responsavel.id,
                     filho.id,
                   )}
-                  className="group flex items-center justify-between gap-[12px] rounded-[14px] border border-[#e8edf8] bg-[#f8fafd] p-[16px] transition-all hover:border-[#3b5fe0]/40 hover:bg-white"
+                  className="group flex items-center justify-between gap-[12px] rounded-[16px] border border-[#e8edf8] bg-white p-[20px] transition-all hover:border-[#3b5fe0]/40 hover:shadow-sm"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-[8px]">
                       <p className="text-[15px] font-semibold text-[#263238] group-hover:text-[#3b5fe0]">
                         {filho.nome}
                       </p>
-                      <span className="rounded-full bg-white px-[8px] py-[2px] text-[11px] font-medium text-[#5e6062]">
+                      <span className="rounded-full bg-[#f0f4ff] px-[8px] py-[2px] text-[11px] font-medium text-[#5e6062]">
                         {PARENTESCO_LABELS[filho.parentesco] ??
                           filho.parentesco}
                       </span>
@@ -132,14 +133,19 @@ export function ResponsavelProfile({
                       ) : null}
                     </div>
 
-                    <p className="pt-[4px] text-[12px] text-[#687386]">
-                      CPF: {filho.cpf} · Nascimento:{' '}
-                      {formatDateBr(filho.dataNascimento)} ·{' '}
-                      {filho.etapaOuTurma}
-                      {filho.turmaNome ? ` (${filho.turmaNome})` : ''}
-                      {filho.pontuacaoTotal !== null
-                        ? ` · ${Number(filho.pontuacaoTotal).toFixed(1)} pts`
-                        : ''}
+                    <p className="flex flex-wrap items-center gap-x-1.5 pt-[4px] text-[12px] text-[#687386]">
+                      <span className="inline-flex items-center gap-1">
+                        <span>CPF:</span>
+                        <CpfReveal cpf={filho.cpf} />
+                      </span>
+                      <span>
+                        · Nascimento: {formatDateBr(filho.dataNascimento)} ·{' '}
+                        {filho.etapaOuTurma}
+                        {filho.turmaNome ? ` (${filho.turmaNome})` : ''}
+                        {filho.pontuacaoTotal !== null
+                          ? ` · ${Number(filho.pontuacaoTotal).toFixed(1)} pts`
+                          : ''}
+                      </span>
                     </p>
                   </div>
 

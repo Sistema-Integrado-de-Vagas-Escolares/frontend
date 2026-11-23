@@ -22,8 +22,8 @@ export const responsaveisKeys = {
           typeof params.comFilhos === 'boolean' ? params.comFilhos : null,
       },
     ] as const,
-  detail: (responsavelId: string) =>
-    [...responsaveisKeys.all, 'detail', responsavelId] as const,
+  detail: (responsavelId: string, incluirCpfCompleto = false) =>
+    [...responsaveisKeys.all, 'detail', responsavelId, { incluirCpfCompleto }] as const,
 };
 
 export function useResponsaveisEscola(params: ListarResponsaveisParams) {
@@ -37,11 +37,17 @@ export function useResponsaveisEscola(params: ListarResponsaveisParams) {
   return query;
 }
 
-export function useResponsavelDetalheEscola(responsavelId: string) {
+export function useResponsavelDetalheEscola(
+  responsavelId: string,
+  options?: { incluirCpfCompleto?: boolean },
+) {
+  const incluirCpfCompleto = Boolean(options?.incluirCpfCompleto);
   const query = useQuery({
-    queryKey: responsaveisKeys.detail(responsavelId),
+    queryKey: responsaveisKeys.detail(responsavelId, incluirCpfCompleto),
     queryFn: () =>
-      buscarResponsavelDetalheEscola(requireEscolaToken(), responsavelId),
+      buscarResponsavelDetalheEscola(requireEscolaToken(), responsavelId, {
+        incluirCpfCompleto,
+      }),
     enabled: Boolean(responsavelId),
   });
 

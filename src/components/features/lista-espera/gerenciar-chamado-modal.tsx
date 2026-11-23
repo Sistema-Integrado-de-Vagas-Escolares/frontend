@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Select } from '@/components/ui/select';
 import type {
   AcaoGerenciarChamado,
   InscricaoEscolaResumo,
@@ -139,14 +140,14 @@ export function GerenciarChamadoModal({
               >
                 Turma para matrícula
               </label>
-              <select
+              <Select
                 id="turma-matricula-select"
                 value={selectedTurmaId}
                 onChange={(event) => {
                   setSelectedTurmaId(event.target.value);
                   if (turmaError) setTurmaError(null);
                 }}
-                className="h-[42px] w-full rounded-[10px] border border-[#e2e7f0] bg-[#f8fafd] px-3 text-[14px] text-[#263238] focus:border-[#3b5fe0] focus:outline-none"
+                className="h-[42px] rounded-[10px] border border-[#e2e7f0] bg-[#f8fafd] pl-3 text-[14px] text-[#263238] focus:border-[#3b5fe0]"
               >
                 <option value="">Selecione uma turma</option>
                 {turmasDisponiveis.map((turma) => (
@@ -157,7 +158,7 @@ export function GerenciarChamadoModal({
                     {turma.vagasDisponiveis === 1 ? 'vaga' : 'vagas'})
                   </option>
                 ))}
-              </select>
+              </Select>
               {turmasDisponiveis.length === 0 ? (
                 <p className="text-xs text-amber-700">
                   Não há turmas com vagas disponíveis no momento.

@@ -14,7 +14,7 @@ export default function ListaEsperaEditarAlunoPage({
   return (
     <AlunoEditarView
       alunoId={alunoId}
-      backHref={ROUTES.LISTA_ESPERA_ALUNO_DETALHE(alunoId)}
+      backHref={ROUTES.CHAMADOS_ALUNO_DETALHE(alunoId)}
     />
   );
 }

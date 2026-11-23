@@ -19,11 +19,11 @@ export function InicioQuickActions({
 
   const cards = [
     {
-      title: 'Lista de Espera',
+      title: 'Chamados',
       subtitle: isLoading
         ? 'Carregando...'
         : `${totalEmEspera} ${totalEmEspera === 1 ? 'aluno aguardando' : 'alunos aguardando'}`,
-      href: ROUTES.LISTA_ESPERA,
+      href: ROUTES.CHAMADOS,
       icon: '/images/painel/card-waitlist.svg',
       iconBg: 'bg-[rgba(59,95,224,0.09)]',
     },

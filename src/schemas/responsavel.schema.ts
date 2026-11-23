@@ -32,7 +32,10 @@ export function formatTelefone(value: string): string {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
-export function validateResponsavelForm(values: ResponsavelFormValues):
+export function validateResponsavelForm(
+  values: ResponsavelFormValues,
+  options?: { allowMaskedCpf?: boolean },
+):
   | { valid: true; payload: CriarResponsavelRequest }
   | { valid: false; errors: ResponsavelFormErrors } {
   const errors: ResponsavelFormErrors = {};
@@ -42,8 +45,10 @@ export function validateResponsavelForm(values: ResponsavelFormValues):
     errors.nome = 'Informe o nome completo do responsável.';
   }
 
+  const isMaskedCpf =
+    Boolean(options?.allowMaskedCpf) && values.cpf.includes('*');
   const cpfDigits = values.cpf.replace(/\D/g, '');
-  if (cpfDigits.length !== 11) {
+  if (!isMaskedCpf && cpfDigits.length !== 11) {
     errors.cpf = 'Informe um CPF válido com 11 dígitos.';
   }
 
@@ -60,7 +65,7 @@ export function validateResponsavelForm(values: ResponsavelFormValues):
     valid: true,
     payload: {
       nome,
-      cpf: formatCpf(cpfDigits),
+      cpf: isMaskedCpf ? values.cpf.trim() : formatCpf(cpfDigits),
       telefone: formatTelefone(telefoneDigits),
     },
   };

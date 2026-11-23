@@ -165,7 +165,7 @@ export default function ListaDeEsperaPage() {
     <div className="flex flex-col gap-[20px]">
       <div>
         <BackLink href={ROUTES.HOME} />
-        <PageHeader title="Chamadas e matrículas" subtitle={escola?.nome} />
+        <PageHeader title="Chamados" subtitle={escola?.nome} />
       </div>
 
       <ProximoFilaCard

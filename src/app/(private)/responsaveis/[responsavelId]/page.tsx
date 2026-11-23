@@ -1,6 +1,7 @@
 'use client';
 
 import { use } from 'react';
+import Link from 'next/link';
 import { useResponsavelDetalheEscola } from '@/api/escola/use-responsaveis';
 import { ApiError } from '@/api/utils/api';
 import { BackLink } from '@/components/common/back-link';
@@ -14,7 +15,9 @@ export default function ResponsavelDetalhePage({
   params: Promise<{ responsavelId: string }>;
 }) {
   const { responsavelId } = use(params);
-  const responsavelQuery = useResponsavelDetalheEscola(responsavelId);
+  const responsavelQuery = useResponsavelDetalheEscola(responsavelId, {
+    incluirCpfCompleto: true,
+  });
 
   const error =
     responsavelQuery.error instanceof ApiError
@@ -27,10 +30,29 @@ export default function ResponsavelDetalhePage({
     <div className="flex flex-col gap-[16px]">
       <div>
         <BackLink href={ROUTES.RESPONSAVEIS} label="Voltar para Responsáveis" />
-        <PageHeader
-          title="Perfil do responsável"
-          subtitle={responsavelQuery.data?.nome}
-        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <PageHeader
+            title="Perfil do responsável"
+            subtitle={responsavelQuery.data?.nome}
+          />
+
+          {responsavelQuery.data ? (
+            <Link
+              href={ROUTES.RESPONSAVEL_EDITAR(responsavelId)}
+              className="inline-flex shrink-0 items-center justify-center gap-[8px] rounded-[14px] bg-[#3b5fe0] px-[16px] py-[10px] text-[14px] font-semibold leading-[20px] tracking-[-0.1504px] text-white transition-colors hover:bg-[#3252c7]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/painel/criterios/edit.svg"
+                alt=""
+                width={16}
+                height={16}
+                className="size-[16px] shrink-0 brightness-0 invert"
+              />
+              <span>Editar responsável</span>
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       {error ? (

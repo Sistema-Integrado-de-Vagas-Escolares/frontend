@@ -28,7 +28,8 @@ export const alunosKeys = {
         serieAno: params.serieAno?.trim() ?? '',
       },
     ] as const,
-  detail: (alunoId: string) => [...alunosKeys.all, 'detail', alunoId] as const,
+  detail: (alunoId: string, incluirCpfCompleto = false) =>
+    [...alunosKeys.all, 'detail', alunoId, { incluirCpfCompleto }] as const,
 };
 
 export function useAlunosEscola(params: ListarAlunosParams) {
@@ -42,10 +43,17 @@ export function useAlunosEscola(params: ListarAlunosParams) {
   return query;
 }
 
-export function useAlunoDetalheEscola(alunoId: string) {
+export function useAlunoDetalheEscola(
+  alunoId: string,
+  options?: { incluirCpfCompleto?: boolean },
+) {
+  const incluirCpfCompleto = Boolean(options?.incluirCpfCompleto);
   const query = useQuery({
-    queryKey: alunosKeys.detail(alunoId),
-    queryFn: () => buscarAlunoDetalheEscola(requireEscolaToken(), alunoId),
+    queryKey: alunosKeys.detail(alunoId, incluirCpfCompleto),
+    queryFn: () =>
+      buscarAlunoDetalheEscola(requireEscolaToken(), alunoId, {
+        incluirCpfCompleto,
+      }),
     enabled: Boolean(alunoId),
   });
 

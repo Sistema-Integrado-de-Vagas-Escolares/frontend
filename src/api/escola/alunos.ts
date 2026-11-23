@@ -36,8 +36,10 @@ export async function listarAlunosEscola(
 export async function buscarAlunoDetalheEscola(
   token: string,
   alunoId: string,
+  options?: { incluirCpfCompleto?: boolean },
 ): Promise<AlunoDetalhe> {
-  return apiRequest<AlunoDetalhe>(`/api/escola/alunos/${alunoId}`, {
+  const query = options?.incluirCpfCompleto ? '?incluirCpfCompleto=true' : '';
+  return apiRequest<AlunoDetalhe>(`/api/escola/alunos/${alunoId}${query}`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`,

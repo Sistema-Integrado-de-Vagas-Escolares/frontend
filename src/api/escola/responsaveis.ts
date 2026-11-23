@@ -39,9 +39,11 @@ export async function listarResponsaveisEscola(
 export async function buscarResponsavelDetalheEscola(
   token: string,
   responsavelId: string,
+  options?: { incluirCpfCompleto?: boolean },
 ): Promise<ResponsavelDetalhe> {
+  const query = options?.incluirCpfCompleto ? '?incluirCpfCompleto=true' : '';
   return apiRequest<ResponsavelDetalhe>(
-    `/api/escola/responsaveis/${responsavelId}`,
+    `/api/escola/responsaveis/${responsavelId}${query}`,
     {
       method: 'GET',
       headers: {
@@ -62,4 +64,21 @@ export async function cadastrarResponsavelEscola(
     },
     body: JSON.stringify(payload),
   });
+}
+
+export async function atualizarResponsavelEscola(
+  token: string,
+  responsavelId: string,
+  payload: CriarResponsavelRequest,
+): Promise<ResponsavelDetalhe> {
+  return apiRequest<ResponsavelDetalhe>(
+    `/api/escola/responsaveis/${responsavelId}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    },
+  );
 }

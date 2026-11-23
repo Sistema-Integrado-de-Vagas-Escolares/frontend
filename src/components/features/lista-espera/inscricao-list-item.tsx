@@ -125,7 +125,7 @@ function ActionButtons({
       ) : null}
 
       <Link
-        href={ROUTES.LISTA_ESPERA_ALUNO_DETALHE(item.alunoId)}
+        href={ROUTES.CHAMADOS_ALUNO_DETALHE(item.alunoId)}
         className="inline-flex h-[36px] items-center justify-center rounded-[10px] bg-[#f0f4ff] px-[14px] text-[13px] font-semibold text-[#5e6062] transition-colors hover:bg-[#e3ebff]"
       >
         Ver perfil

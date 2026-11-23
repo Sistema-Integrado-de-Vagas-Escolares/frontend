@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
+import { Select } from '@/components/ui/select';
 import { TODOS_NIVEIS } from '@/constants/niveis';
 import type { Turno } from '@/entities/aluno';
 import type { Turma } from '@/entities/turma';
@@ -120,28 +121,18 @@ export function TurmaForm({
           >
             Série / Nível *
           </label>
-          <div className="relative">
-            <select
-              id="turma-serie"
-              value={serieAno}
-              onChange={(event) => setSerieAno(event.target.value)}
-              className="h-[44px] w-full cursor-pointer appearance-none rounded-[14px] bg-[#f0f4ff] px-[16px] pr-10 text-[14px] text-[#263238] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-            >
-              {TODOS_NIVEIS.map((nivel) => (
-                <option key={nivel} value={nivel}>
-                  {nivel}
-                </option>
-              ))}
-            </select>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/painel/chevron-down.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="pointer-events-none absolute right-[12px] top-1/2 size-[20px] -translate-y-1/2"
-            />
-          </div>
+          <Select
+            id="turma-serie"
+            value={serieAno}
+            onChange={(event) => setSerieAno(event.target.value)}
+            className="h-[44px] rounded-[14px] bg-[#f0f4ff] pl-[16px] text-[14px] text-[#263238] focus:ring-2 focus:ring-[#3b5fe0]"
+          >
+            {TODOS_NIVEIS.map((nivel) => (
+              <option key={nivel} value={nivel}>
+                {nivel}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className="flex flex-col gap-[6px]">
@@ -171,28 +162,18 @@ export function TurmaForm({
           >
             Turno *
           </label>
-          <div className="relative">
-            <select
-              id="turma-turno"
-              value={turno}
-              onChange={(event) => setTurno(event.target.value as Turno)}
-              className="h-[44px] w-full cursor-pointer appearance-none rounded-[14px] bg-[#f0f4ff] px-[16px] pr-10 text-[14px] text-[#263238] focus:outline-none focus:ring-2 focus:ring-[#3b5fe0]"
-            >
-              {TURNO_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/painel/chevron-down.svg"
-              alt=""
-              width={20}
-              height={20}
-              className="pointer-events-none absolute right-[12px] top-1/2 size-[20px] -translate-y-1/2"
-            />
-          </div>
+          <Select
+            id="turma-turno"
+            value={turno}
+            onChange={(event) => setTurno(event.target.value as Turno)}
+            className="h-[44px] rounded-[14px] bg-[#f0f4ff] pl-[16px] text-[14px] text-[#263238] focus:ring-2 focus:ring-[#3b5fe0]"
+          >
+            {TURNO_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Select>
         </div>
 
         <div className="flex flex-col gap-[6px]">

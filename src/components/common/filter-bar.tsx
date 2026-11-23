@@ -114,7 +114,7 @@ export function FilterBar({
                   value={filterValue}
                   onChange={(event) => onFilterChange?.(event.target.value)}
                   className={cn(
-                    'w-full cursor-pointer appearance-none bg-transparent pr-6 text-[14px] font-normal leading-[20px] focus:outline-none',
+                    'w-full cursor-pointer appearance-none bg-transparent pr-8 text-[14px] font-normal leading-[20px] focus:outline-none',
                     hasSelectFilter
                       ? 'font-medium text-[#3b5fe0]'
                       : 'text-[#263238]',
@@ -130,9 +130,9 @@ export function FilterBar({
                 <img
                   src="/images/painel/chevron-down.svg"
                   alt=""
-                  width={20}
-                  height={20}
-                  className="pointer-events-none absolute right-[12px] size-[20px] shrink-0"
+                  width={18}
+                  height={18}
+                  className="pointer-events-none absolute right-[14px] size-[18px] shrink-0"
                 />
               </div>
             ) : null}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { format, isValid, parseISO } from 'date-fns';
+import { Plus } from 'lucide-react';
 import { CpfReveal } from '@/components/common/cpf-reveal';
 import { ROUTES } from '@/constants/routes';
 import type { Parentesco } from '@/entities/aluno';
@@ -80,9 +81,18 @@ export function ResponsavelProfile({
       </section>
 
       <section className="flex flex-col gap-[12px]">
-        <h2 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
-          Filhos vinculados ({responsavel.filhos.length})
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
+            Filhos vinculados ({responsavel.filhos.length})
+          </h2>
+          <Link
+            href={`${ROUTES.ALUNOS_NOVO}?responsavelId=${responsavel.id}`}
+            className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#dce4f7] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#3b5fe0] transition-colors hover:bg-[#eef2ff]"
+          >
+            <Plus className="size-3.5" aria-hidden="true" />
+            <span>Adicionar aluno</span>
+          </Link>
+        </div>
 
         {responsavel.filhos.length === 0 ? (
           <p className="rounded-[16px] border border-[#e8edf8] bg-white p-[21px] text-sm text-[#979799]">

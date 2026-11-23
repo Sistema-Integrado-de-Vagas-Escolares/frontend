@@ -72,7 +72,7 @@ export function AlunoDetalheView({
           Carregando perfil do aluno...
         </div>
       ) : (
-        <AlunoProfile aluno={alunoQuery.data} />
+        <AlunoProfile aluno={alunoQuery.data} editHref={editHref} />
       )}
     </div>
   );

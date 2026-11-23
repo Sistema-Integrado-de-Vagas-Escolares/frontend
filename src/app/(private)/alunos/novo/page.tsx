@@ -1,17 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { BackLink } from '@/components/common/back-link';
 import { PageHeader } from '@/components/common/page-header';
 import { AlunoForm } from '@/components/features/alunos/aluno-form';
 import { ROUTES } from '@/constants/routes';
 
-export default function NovoAlunoPage() {
+function NovoAlunoContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams();
+  const responsavelId = searchParams.get('responsavelId') ?? undefined;
+  const backHref = responsavelId
+    ? ROUTES.RESPONSAVEL_DETALHE(responsavelId)
+    : ROUTES.ALUNOS;
 
   return (
     <div>
-      <BackLink href={ROUTES.ALUNOS} label="Voltar" />
+      <BackLink href={backHref} label="Voltar" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <PageHeader
           title="Cadastrar aluno"
@@ -38,7 +44,25 @@ export default function NovoAlunoPage() {
         </button>
       </div>
 
-      <AlunoForm formId="aluno-form" onSubmittingChange={setIsSubmitting} />
+      <AlunoForm
+        formId="aluno-form"
+        initialResponsavelId={responsavelId}
+        onSubmittingChange={setIsSubmitting}
+      />
     </div>
+  );
+}
+
+export default function NovoAlunoPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-12 text-center text-sm text-[#979799]">
+          Carregando formulário...
+        </div>
+      }
+    >
+      <NovoAlunoContent />
+    </Suspense>
   );
 }

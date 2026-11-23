@@ -90,12 +90,15 @@ export function ResponsavelForm({
             ROUTES.RESPONSAVEL_DETALHE(initialResponsavel.id),
         );
       } else {
-        await cadastrarResponsavelEscola(session.token, validation.payload);
+        const criado = await cadastrarResponsavelEscola(
+          session.token,
+          validation.payload,
+        );
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: responsaveisKeys.all }),
           refreshResumo(),
         ]);
-        router.push(ROUTES.RESPONSAVEIS);
+        router.push(ROUTES.RESPONSAVEL_DETALHE(criado.id));
       }
     } catch (error) {
       if (error instanceof ApiError) {

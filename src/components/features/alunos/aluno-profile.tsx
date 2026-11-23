@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { differenceInYears, format, isValid, parseISO } from 'date-fns';
-import { Check, Copy, Link2 } from 'lucide-react';
+import { Check, Copy, Link2, UserPlus } from 'lucide-react';
 import { CpfReveal } from '@/components/common/cpf-reveal';
 import { ROUTES } from '@/constants/routes';
 import type { AlunoDetalhe, Parentesco, Turno } from '@/entities/aluno';
@@ -67,7 +68,13 @@ function formatCurrency(value?: number | null): string {
   });
 }
 
-export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
+export function AlunoProfile({
+  aluno,
+  editHref,
+}: {
+  aluno: AlunoDetalhe;
+  editHref?: string;
+}) {
   const [copiedProtocol, setCopiedProtocol] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -267,9 +274,20 @@ export function AlunoProfile({ aluno }: { aluno: AlunoDetalhe }) {
 
       {/* Responsáveis vinculados */}
       <section className="rounded-[16px] border border-[#e8edf8] bg-white p-[21px]">
-        <h3 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
-          Responsáveis vinculados ({aluno.responsaveis.length})
-        </h3>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-[12px] font-bold uppercase tracking-[0.6px] text-[#5e6062]">
+            Responsáveis vinculados ({aluno.responsaveis.length})
+          </h3>
+          {editHref ? (
+            <Link
+              href={`${editHref}?secao=responsaveis`}
+              className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#dce4f7] bg-[#f8faff] px-3 py-1.5 text-[12px] font-semibold text-[#3b5fe0] transition-colors hover:bg-[#eef2ff]"
+            >
+              <UserPlus className="size-3.5" aria-hidden="true" />
+              <span>Vincular responsável</span>
+            </Link>
+          ) : null}
+        </div>
         {aluno.responsaveis.length === 0 ? (
           <p className="pt-[12px] text-sm text-[#979799]">
             Nenhum responsável vinculado.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { clearEscolaSession, getEscolaSession } from '@/api/auth/login';
@@ -11,6 +11,7 @@ import {
 import { listarResponsaveisEscola } from '@/api/escola/responsaveis';
 import { alunosKeys } from '@/api/escola/use-alunos';
 import { inscricoesKeys } from '@/api/escola/use-inscricoes';
+import { useResponsavelDetalheEscola } from '@/api/escola/use-responsaveis';
 import { ApiError } from '@/api/utils/api';
 import { AccordionSection } from '@/components/common/accordion-section';
 import { AlunoInscricaoSucessoModal } from '@/components/features/alunos/aluno-inscricao-sucesso-modal';
@@ -116,6 +117,7 @@ interface ResponsavelVinculadoItem {
 
 interface AlunoFormProps {
   initialAluno?: AlunoDetalhe;
+  initialResponsavelId?: string;
   redirectToAfterSave?: string;
   formId?: string;
   onSubmittingChange?: (isSubmitting: boolean) => void;
@@ -128,6 +130,7 @@ function formatRendaInitial(value?: number | null): string {
 
 export function AlunoForm({
   initialAluno,
+  initialResponsavelId,
   redirectToAfterSave,
   formId = 'aluno-form',
   onSubmittingChange,
@@ -206,6 +209,7 @@ export function AlunoForm({
     useState<SugestaoNivelPorNascimento | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [inscricaoCriada, setInscricaoCriada] = useState<{
+    id: string;
     nome: string;
     protocolo: string;
   } | null>(null);
@@ -216,8 +220,46 @@ export function AlunoForm({
     vaga: false,
     endereco: false,
     criterios: false,
-    responsaveis: false,
+    responsaveis: Boolean(initialResponsavelId),
   });
+
+  const initialResponsavelQuery = useResponsavelDetalheEscola(
+    !isEditing && initialResponsavelId ? initialResponsavelId : '',
+  );
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('secao') === 'responsaveis') {
+      setExpandedSections((prev) => ({
+        ...prev,
+        responsaveis: true,
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
+    const resp = initialResponsavelQuery.data;
+    if (!resp || isEditing) return;
+    setVinculados((prev) => {
+      if (prev.some((item) => item.responsavel.id === resp.id)) {
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          responsavel: {
+            id: resp.id,
+            nome: resp.nome,
+            cpf: resp.cpf,
+            telefone: resp.telefone,
+            totalFilhos: resp.filhos.length,
+          },
+          parentesco: 'MAE',
+        },
+      ];
+    });
+  }, [initialResponsavelQuery.data, isEditing]);
 
   function toggleSection(section: AlunoFormSection) {
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
@@ -445,11 +487,12 @@ export function AlunoForm({
         ]);
         if (criado.protocolo) {
           setInscricaoCriada({
+            id: criado.id,
             nome: criado.nome,
             protocolo: criado.protocolo,
           });
         } else {
-          router.push(ROUTES.ALUNOS);
+          router.push(ROUTES.ALUNO_DETALHE(criado.id));
         }
       }
     } catch (error) {
@@ -1222,7 +1265,7 @@ export function AlunoForm({
         <AlunoInscricaoSucessoModal
           nomeAluno={inscricaoCriada.nome}
           protocolo={inscricaoCriada.protocolo}
-          onClose={() => router.push(ROUTES.ALUNOS)}
+          onClose={() => router.push(ROUTES.ALUNO_DETALHE(inscricaoCriada.id))}
         />
       ) : null}
     </>

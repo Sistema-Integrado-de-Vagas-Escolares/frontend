@@ -135,7 +135,7 @@ export function PainelShell({ children }: { children: React.ReactNode }) {
         ) : null}
 
         <div className="lg:pl-[288px]">
-          <main className="w-full max-w-[1200px] p-6 sm:p-[32px]">
+          <main className="w-full max-w-[1200px] p-6 sm:p-[32px] mx-auto">
             {children}
           </main>
         </div>

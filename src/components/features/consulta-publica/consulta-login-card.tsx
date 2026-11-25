@@ -58,99 +58,106 @@ export function ConsultaLoginCard({ onSuccess }: ConsultaLoginCardProps) {
   return (
     <section
       aria-label="Acompanhar matrícula"
-      className="flex w-full max-w-[400px] flex-col items-center"
+      className="flex w-full max-w-[384px] flex-col items-start"
     >
-      <div className="flex flex-col items-center pb-[28px] text-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/painel/logo-sive-blue.png"
-          alt="Logo SIVE"
-          width={56}
-          height={56}
-          className="h-[56px] w-auto object-contain"
-        />
-        <h1 className="pt-[16px] text-[24px] font-bold leading-[32px] tracking-[-0.3px] text-[#263238]">
+      <header className="flex w-full flex-col items-center rounded-t-[24px] bg-[#3b5fe0] px-6 py-8">
+        <div className="flex h-[56px] items-end">
+          <div className="relative h-[48px] w-[32px] shrink-0 overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-sive-s.png"
+              alt="SIVE"
+              className="pointer-events-none absolute top-0 left-[-25.02%] h-full w-[143.79%] max-w-none"
+            />
+          </div>
+          <span className="text-[40px] font-bold leading-[36px] tracking-tight text-white">
+            ive
+          </span>
+        </div>
+
+        <h1 className="pt-5 text-center text-[24px] font-bold leading-[28px] text-white">
           Acompanhar Matrícula
         </h1>
-        <p className="pt-[4px] text-[14px] leading-[20px] text-[#687386]">
+        <p className="pt-2 text-center text-[13px] leading-[18px] text-white/80">
           Informe o CPF do responsável e o protocolo do chamado para acompanhar a
           posição na fila.
         </p>
-      </div>
+      </header>
 
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="flex w-full flex-col rounded-[16px] border border-[#e8edf8] bg-white p-[24px] shadow-xs"
+        className="flex w-full flex-col rounded-b-[24px] bg-white p-6 shadow-[0px_20px_12.5px_rgba(0,0,0,0.1),0px_8px_5px_rgba(0,0,0,0.1)]"
       >
-        <div className="flex flex-col gap-[6px]">
+        <div className="flex w-full flex-col">
           <Label htmlFor="consulta-cpf">CPF do responsável</Label>
-          <Input
-            id="consulta-cpf"
-            name="cpf"
-            type="text"
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder="000.000.000-00"
-            value={cpf}
-            onChange={(event) => {
-              setCpf(formatCpf(event.target.value));
-              if (fieldErrors.cpf) {
-                setFieldErrors((prev) => ({ ...prev, cpf: undefined }));
-              }
-            }}
-            aria-invalid={Boolean(fieldErrors.cpf)}
-            className="h-[44px] rounded-[14px] bg-[#f0f4ff] px-[16px] text-[14px] text-[#263238] placeholder:text-[#bfc5d2]"
-          />
+          <div className="pt-[6px]">
+            <Input
+              id="consulta-cpf"
+              name="cpf"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder="000.000.000-00"
+              value={cpf}
+              onChange={(event) => {
+                setCpf(formatCpf(event.target.value));
+                if (fieldErrors.cpf) {
+                  setFieldErrors((prev) => ({ ...prev, cpf: undefined }));
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.cpf)}
+            />
+          </div>
           {fieldErrors.cpf ? (
-            <p className="text-xs text-red-600">{fieldErrors.cpf}</p>
+            <p className="pt-1 text-xs text-red-600">{fieldErrors.cpf}</p>
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-[6px] pt-[16px]">
+        <div className="flex w-full flex-col py-4">
           <Label htmlFor="consulta-protocolo">Protocolo do chamado</Label>
-          <Input
-            id="consulta-protocolo"
-            name="protocolo"
-            type="text"
-            autoComplete="off"
-            placeholder="SIVE-XXXXXXXX"
-            value={protocolo}
-            onChange={(event) => {
-              setProtocolo(event.target.value.toUpperCase());
-              if (fieldErrors.protocolo) {
-                setFieldErrors((prev) => ({ ...prev, protocolo: undefined }));
-              }
-            }}
-            aria-invalid={Boolean(fieldErrors.protocolo)}
-            className="h-[44px] rounded-[14px] bg-[#f0f4ff] px-[16px] font-mono text-[14px] uppercase text-[#263238] placeholder:font-sans placeholder:normal-case placeholder:text-[#bfc5d2]"
-          />
+          <div className="pt-[6px]">
+            <Input
+              id="consulta-protocolo"
+              name="protocolo"
+              type="text"
+              autoComplete="off"
+              placeholder="SIVE-XXXXXXXX"
+              value={protocolo}
+              onChange={(event) => {
+                setProtocolo(event.target.value.toUpperCase());
+                if (fieldErrors.protocolo) {
+                  setFieldErrors((prev) => ({ ...prev, protocolo: undefined }));
+                }
+              }}
+              aria-invalid={Boolean(fieldErrors.protocolo)}
+              className="font-mono uppercase placeholder:font-sans placeholder:normal-case"
+            />
+          </div>
           {fieldErrors.protocolo ? (
-            <p className="text-xs text-red-600">{fieldErrors.protocolo}</p>
+            <p className="pt-1 text-xs text-red-600">{fieldErrors.protocolo}</p>
           ) : null}
         </div>
 
         {submitError ? (
           <div
             role="alert"
-            className="mt-4 rounded-[12px] border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700"
+            className="mb-4 rounded-[12px] border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700"
           >
             {submitError}
           </div>
         ) : null}
 
-        <div className="pt-[20px]">
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="h-[46px] w-full rounded-[14px] bg-[#3b5fe0] text-[14px] font-semibold text-white hover:bg-[#3252c7]"
-          >
-            {isSubmitting ? 'Consultando...' : 'Consultar posição'}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="h-[48px] w-full bg-[#3b5fe0] text-[14px] font-semibold leading-[20px] text-white hover:bg-[#3252c7]"
+        >
+          {isSubmitting ? 'Consultando...' : 'Consultar Posição'}
+        </Button>
       </form>
 
-      <p className="pt-[20px] text-center text-[13px] text-[#687386]">
+      <p className="w-full pt-[20px] text-center text-[13px] text-[#687386]">
         É gestor escolar?{' '}
         <Link
           href={ROUTES.LOGIN}
